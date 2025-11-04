@@ -1,0 +1,23 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Label Styles -->
+    <Style TargetType="Label" x:Key="TitleLabel">
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontAttributes" Value="Bold" />
+    </Style>
+
+    <Style TargetType="Label" x:Key="BodyText">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextColor" Value="{StaticResource Gray600}" />
+    </Style>
+
+    <!-- Frame Style -->
+    <Style TargetType="Frame" x:Key="CardFrame">
+        <Setter Property="CornerRadius" Value="15" />
+        <Setter Property="HasShadow" Value="True" />
+        <Setter Property="Padding" Value="20" />
+        <Setter Property="BorderColor" Value="{StaticResource Primary}" />
+    </Style>
+
+</ResourceDictionary>

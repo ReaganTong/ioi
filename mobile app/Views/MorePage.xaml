@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="mobile_app.Views.MorePage"
+             Title="More">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <Label Text="More Options"
+                   FontSize="24"
+                   FontAttributes="Bold" />
+
+            <!-- Motivational Corner -->
+            <Frame BorderColor="{StaticResource Primary}"
+                   CornerRadius="10"
+                   Padding="15"
+                   HasShadow="True">
+                <HorizontalStackLayout Spacing="15">
+                    <Label Text="💡" FontSize="28" VerticalOptions="Center" />
+                    <VerticalStackLayout>
+                        <Label Text="Motivational Corner"
+                               FontSize="18"
+                               FontAttributes="Bold" />
+                        <Label Text="Daily inspiration and positive messages"
+                               FontSize="13"
+                               TextColor="{StaticResource Gray600}" />
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </Frame>
+
+            <!-- Awareness Feed -->
+            <Frame BorderColor="{StaticResource Primary}"
+                   CornerRadius="10"
+                   Padding="15"
+                   HasShadow="True">
+                <HorizontalStackLayout Spacing="15">
+                    <Label Text="📰" FontSize="28" VerticalOptions="Center" />
+                    <VerticalStackLayout>
+                        <Label Text="Awareness Feed"
+                               FontSize="18"
+                               FontAttributes="Bold" />
+                        <Label Text="Latest news and campaigns"
+                               FontSize="13"
+                               TextColor="{StaticResource Gray600}" />
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </Frame>
+
+            <!-- Settings -->
+            <Label Text="Settings"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   Margin="0,10,0,0" />
+
+            <Frame BorderColor="{StaticResource Gray200}"
+                   CornerRadius="10"
+                   Padding="15"
+                   HasShadow="True">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <Label Text="Push Notifications"
+                           FontSize="16"
+                           VerticalOptions="Center" />
+                    <Switch Grid.Column="1" IsToggled="True"
+                            OnColor="{StaticResource Primary}" />
+                </Grid>
+            </Frame>
+
+            <Frame BorderColor="{StaticResource Gray200}"
+                   CornerRadius="10"
+                   Padding="15"
+                   HasShadow="True">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <Label Text="Daily Reminders"
+                           FontSize="16"
+                           VerticalOptions="Center" />
+                    <Switch Grid.Column="1" IsToggled="True"
+                            OnColor="{StaticResource Primary}" />
+                </Grid>
+            </Frame>
+
+            <!-- About -->
+            <Label Text="About"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   Margin="0,10,0,0" />
+
+            <Frame BorderColor="{StaticResource Gray200}"
+                   CornerRadius="10"
+                   Padding="15"
+                   HasShadow="True">
+                <VerticalStackLayout>
+                    <Label Text="Anti-Bullying Awareness App"
+                           FontSize="16"
+                           FontAttributes="Bold" />
+                    <Label Text="Created to promote empathy, awareness, and provide help resources for those affected by bullying."
+                           FontSize="13"
+                           TextColor="{StaticResource Gray600}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Label Text="Version 1.0.0"
+                   FontSize="12"
+                   TextColor="{StaticResource Gray600}"
+                   HorizontalOptions="Center"
+                   Margin="0,20,0,20" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

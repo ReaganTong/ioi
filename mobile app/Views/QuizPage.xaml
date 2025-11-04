@@ -1,0 +1,29 @@
+<ContentPage
+    x:Class="mobile_app.Views.QuizPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:mobile_app.ViewModels">
+
+    <ContentPage.BindingContext>
+        <viewmodels:QuizViewModel />
+    </ContentPage.BindingContext>
+
+    <CollectionView ItemsSource="{Binding Quizzes}">
+        <CollectionView.ItemTemplate>
+            <DataTemplate>
+                <Border StrokeThickness="0" Margin="8" BackgroundColor="{Binding Color}" 
+                        StrokeShape="RoundRectangle 12">
+                    <VerticalStackLayout Padding="12">
+                        <Label Text="{Binding Title}"
+                               FontAttributes="Bold"
+                               FontSize="20"
+                               TextColor="White" />
+                        <Label Text="{Binding Description}"
+                               FontSize="14"
+                               TextColor="White" />
+                    </VerticalStackLayout>
+                </Border>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+    </CollectionView>
+</ContentPage>

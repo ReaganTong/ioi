@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="mobile_app.Views.LessonDetailPage"
+             Title="Lesson">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- Lesson Title -->
+            <Label Text="Physical Bullying"
+                   FontSize="28"
+                   FontAttributes="Bold" />
+
+            <!-- Lesson Icon -->
+            <Frame BackgroundColor="{StaticResource AlertRed}"
+                   CornerRadius="50"
+                   Padding="20"
+                   HeightRequest="100"
+                   WidthRequest="100"
+                   HorizontalOptions="Center"
+                   HasShadow="False">
+                <Label Text="👊"
+                       FontSize="48"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Frame>
+
+            <!-- Lesson Description -->
+            <Label Text="What is it?" 
+                   FontSize="20"
+                   FontAttributes="Bold" />
+            <Frame BorderColor="{StaticResource Gray200}"
+                   CornerRadius="10"
+                   Padding="15"
+                   HasShadow="True">
+                <Label Text="Physical bullying involves hurting someone's body or possessions. This includes hitting, kicking, pushing, tripping, or damaging someone's belongings."
+                       FontSize="14"
+                       LineBreakMode="WordWrap" />
+            </Frame>
+
+            <!-- Examples -->
+            <Label Text="Common Examples"
+                   FontSize="20"
+                   FontAttributes="Bold" />
+            <Frame BorderColor="{StaticResource Gray200}"
+                   CornerRadius="10"
+                   Padding="15"
+                   HasShadow="True">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="• Hitting, punching, or kicking" FontSize="14" />
+                    <Label Text="• Pushing or shoving" FontSize="14" />
+                    <Label Text="• Tripping someone on purpose" FontSize="14" />
+                    <Label Text="• Damaging someone's property" FontSize="14" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- What You Can Do -->
+            <Label Text="What You Can Do"
+                   FontSize="20"
+                   FontAttributes="Bold" />
+            <Frame BackgroundColor="{StaticResource SafeGreen}"
+                   CornerRadius="10"
+                   Padding="15"
+                   HasShadow="True">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="If you're experiencing physical bullying:" 
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="White" />
+                    <Label Text="1. Tell a trusted adult immediately" FontSize="14" TextColor="White" />
+                    <Label Text="2. Stay in safe areas with others" FontSize="14" TextColor="White" />
+                    <Label Text="3. Report to school authorities or police" FontSize="14" TextColor="White" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Action Buttons -->
+            <Button Text="📞 Get Help Now"
+                    BackgroundColor="{StaticResource AlertRed}"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50"
+                    FontSize="18"
+                    FontAttributes="Bold" />
+
+            <Button Text="✅ Mark as Complete"
+                    BackgroundColor="{StaticResource SafeGreen}"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50"
+                    FontSize="18" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
