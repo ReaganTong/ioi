@@ -34,18 +34,42 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Remove="Platforms\Windows\App.xaml" />
+		<Compile Update="Models\Lesson.cs" />
+		<Compile Update="Models\HelpResource.cs" />
+		<Compile Update="ViewModels\LessonViewModel.cs" />
+		<Compile Update="ViewModels\HelpViewModel.cs" />
+		<Compile Update="Views\HelpPage.xaml.cs">
+			<DependentUpon>HelpPage.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\LessonsPage.xaml.cs">
+		  <DependentUpon>LessonsPage.xaml</DependentUpon>
+		</Compile>
+		<MauiXaml Update="Views\HelpPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Page Include="Platforms\Windows\App.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
+		<MauiXaml Remove="Platforms\Windows\App.xaml" />
+		<MauiXaml Remove="Views\LessonsPage.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Views\LessonsPage.xaml">
+	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Include="Platforms\Windows\App.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.5" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 	</ItemGroup>
 
 </Project>

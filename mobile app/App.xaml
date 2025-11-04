@@ -4,11 +4,56 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- global resources -->
     <Application.Resources>
         <ResourceDictionary>
-            <Color x:Key="PrimaryColor">#512BD4</Color>
+
+            <Color x:Key="PrimaryColor">#4A90E2</Color>
+            <Color x:Key="SecondaryColor">#FFC652</Color>
+            <Color x:Key="SafeGreen">#4CD964</Color>
+            <Color x:Key="AlertRed">#FF3B30</Color>
+            <Color x:Key="WarningOrange">#FF9800</Color>
+            <Color x:Key="CalmBlue">#2196F3</Color>
+            <Color x:Key="SoftPurple">#9C27B0</Color>
+            <Color x:Key="TextColor">#333333</Color>
+            <Color x:Key="BackgroundColor">#F5F5F5</Color>
+            <Color x:Key="Gray200">#E0E0E0</Color>
+            <Color x:Key="Gray600">#666666</Color>
+
+            <Style TargetType="ContentPage" ApplyToDerivedTypes="True">
+                <Setter Property="BackgroundColor" Value="{StaticResource BackgroundColor}" />
+            </Style>
+
+            <Style x:Key="PrimaryButton" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="{StaticResource PrimaryColor}" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="CornerRadius" Value="25" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="Padding" Value="15, 10" />
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal" />
+                            <VisualState x:Name="Pressed">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="#3D77B8" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+
+            <Style TargetType="Frame" x:Key="CardFrameStyle">
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="Padding" Value="15" />
+                <Setter Property="HasShadow" Value="True" />
+                <Setter Property="Shadow">
+                    <Shadow Brush="Gray" Offset="2,2" Radius="5" Opacity="0.5" />
+                </Setter>
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="BorderColor" Value="Transparent" />
+            </Style>
+
         </ResourceDictionary>
     </Application.Resources>
-
 </Application>

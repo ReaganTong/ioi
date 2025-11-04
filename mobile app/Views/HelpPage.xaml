@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="mobile_app.Views.HelpPage"
+             xmlns:viewmodels="clr-namespace:mobile_app.ViewModels"
+             Title="Help Directory">
+
+    <ContentPage.BindingContext>
+        <viewmodels:HelpViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <Label Text="Trusted Support Channels" 
+                   FontSize="28" 
+                   FontAttributes="Bold" 
+                   TextColor="{StaticResource TextColor}" />
+
+            <Label Text="Find official hotlines and organizations in Malaysia ready to offer immediate help and guidance."
+                   FontSize="14"
+                   TextColor="{StaticResource Gray600}" />
+
+            <CollectionView ItemsSource="{Binding Hotlines}"
+                            SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Style="{StaticResource CardFrameStyle}"
+                               Margin="0, 8"
+                               BorderColor="{Binding AccentColor}"
+                               Padding="15">
+                            <VerticalStackLayout Spacing="10">
+
+                                <Grid ColumnDefinitions="*, Auto" ColumnSpacing="15">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="5">
+                                        <Label Text="{Binding Name}"
+                                               FontSize="18"
+                                               FontAttributes="Bold"
+                                               TextColor="{Binding AccentColor}" />
+
+                                        <Label Text="{Binding Description}"
+                                               FontSize="14"
+                                               TextColor="{StaticResource TextColor}" />
+
+                                        <Label Text="{Binding ContactInfo}"
+                                               FontSize="12"
+                                               TextColor="{StaticResource Gray600}" />
+                                    </VerticalStackLayout>
+
+                                    <Label Text="{Binding Icon}" 
+                                           Grid.Column="1"
+                                           FontSize="36" 
+                                           VerticalOptions="Start" />
+                                </Grid>
+
+                                <Button Text="{Binding Action, StringFormat='{0} Now'}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:HelpViewModel}}, Path=PerformActionCommand}"
+                                        CommandParameter="{Binding .}"
+                                        Style="{StaticResource PrimaryButton}"
+                                        BackgroundColor="{Binding AccentColor}"
+                                        Margin="0, 10, 0, 0" />
+
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

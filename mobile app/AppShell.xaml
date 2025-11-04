@@ -3,20 +3,45 @@
     x:Class="mobile_app.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:views="clr-namespace:mobile_app.Views">
+    xmlns:views="clr-namespace:mobile_app.Views"
+    Shell.FlyoutBehavior="Disabled"
+    Title="Anti-Bully App">
 
     <TabBar>
         <ShellContent
             Title="Home"
-            ContentTemplate="{DataTemplate views:MainPage}" />
+            Icon="home_icon.png" 
+            ContentTemplate="{DataTemplate views:MainPage}"
+            Route="Home" />
+
         <ShellContent
-            Title="Lessons"
-            ContentTemplate="{DataTemplate views:LessonDetailPage}" />
+            Title="Learn"
+            Icon="book_icon.png"
+            ContentTemplate="{DataTemplate views:LessonsPage}"
+            Route="Lessons" />
+
         <ShellContent
-            Title="Quiz"
-            ContentTemplate="{DataTemplate views:QuizPage}" />
+            Title="Quizzes"
+            Icon="quiz_icon.png"
+            ContentTemplate="{DataTemplate views:QuizPage}"
+            Route="Quizzes" />
+
+        <ShellContent
+            Title="Get Help"
+            Icon="support_icon.png"
+            ContentTemplate="{DataTemplate views:HelpPage}"
+            Route="Help" />
+
         <ShellContent
             Title="More"
-            ContentTemplate="{DataTemplate views:MorePage}" />
+            Icon="more_icon.png"
+            ContentTemplate="{DataTemplate views:MorePage}"
+            Route="More" />
+
     </TabBar>
+
+    <Shell.Routing.RouteMappings>
+        <RouteMapping Route="LessonDetail" ShellContent="{DataTemplate views:LessonDetailPage}" />
+    </Shell.Routing.RouteMappings>
+
 </Shell>
