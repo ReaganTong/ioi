@@ -40,8 +40,4 @@
 
     </TabBar>
 
-    <Shell.Routing.RouteMappings>
-        <RouteMapping Route="LessonDetail" ShellContent="{DataTemplate views:LessonDetailPage}" />
-    </Shell.Routing.RouteMappings>
-
 </Shell>

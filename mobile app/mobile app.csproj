@@ -42,8 +42,14 @@
 			<DependentUpon>HelpPage.xaml</DependentUpon>
 		</Compile>
 		<Compile Update="Views\LessonsPage.xaml.cs">
-		  <DependentUpon>LessonsPage.xaml</DependentUpon>
+			<DependentUpon>LessonsPage.xaml</DependentUpon>
 		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<MauiXaml Update="Views\LessonsPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		<MauiXaml Update="Views\HelpPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
@@ -51,13 +57,6 @@
 
 	<ItemGroup>
 		<MauiXaml Remove="Platforms\Windows\App.xaml" />
-		<MauiXaml Remove="Views\LessonsPage.xaml" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EmbeddedResource Include="Views\LessonsPage.xaml">
-	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-	  </EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>
