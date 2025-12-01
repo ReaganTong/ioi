@@ -1,5 +1,5 @@
 ﻿using mobile_app.ViewModels;
-using mobile_app.Models; // ✅ Needed to recognize 'Lesson'
+using mobile_app.Models; // ✅ Important: Required to see 'Lesson'
 using Microsoft.Maui.Controls;
 
 namespace mobile_app.Views;
@@ -12,18 +12,17 @@ public partial class LessonsPage : ContentPage
         this.BindingContext = viewModel;
     }
 
-    // ✅ This method runs automatically when a user taps an item
+    // ✅ FIX 2: This method runs instantly when you tap an item
     private async void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        // 1. Check if an item was actually selected
+        // 1. Get the item user tapped
         if (e.CurrentSelection.FirstOrDefault() is Lesson selectedLesson)
         {
-            // 2. Trigger the navigation command in your ViewModel
+            // 2. Trigger the navigation
             var viewModel = (LessonViewModel)BindingContext;
             await viewModel.GoToDetailsCommand.ExecuteAsync(selectedLesson);
 
-            // 3. CRITICAL: Unselect the item immediately.
-            // This resets the list so the user can tap the same item again later.
+            // 3. Reset the selection so it can be clicked again
             ((CollectionView)sender).SelectedItem = null;
         }
     }
