@@ -20,36 +20,41 @@
                    TextColor="{StaticResource Gray600}" />
 
             <CollectionView ItemsSource="{Binding Lessons}"
-                            SelectionMode="Single"
-                            SelectionChanged="OnSelectionChanged"
-                            Margin="10, 0">
+                Margin="10, 0">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame Style="{StaticResource CardFrameStyle}" 
-                               Margin="10, 5"
-                               BackgroundColor="{Binding Color}"
-                               Padding="0">
+                   Margin="10, 5"
+                   BackgroundColor="{Binding Color}"
+                   Padding="0">
+
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer 
+                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LessonViewModel}}, Path=GoToDetailsCommand}"
+                        CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
 
                             <Grid ColumnDefinitions="70, *" Padding="15">
                                 <Label Text="{Binding Icon}" 
-                                       FontSize="40" 
-                                       VerticalOptions="Center" 
-                                       HorizontalOptions="Center" />
+                           FontSize="40" 
+                           VerticalOptions="Center" 
+                           HorizontalOptions="Center" />
 
                                 <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="5">
                                     <Label Text="{Binding Title}" 
-                                           FontAttributes="Bold" 
-                                           FontSize="18" 
-                                           TextColor="White" />
+                               FontAttributes="Bold" 
+                               FontSize="18" 
+                               TextColor="White" />
                                     <Label Text="{Binding ShortDescription}" 
-                                           FontSize="13" 
-                                           TextColor="#F0F0F0" />
+                               FontSize="13" 
+                               TextColor="#F0F0F0" />
                                 </VerticalStackLayout>
                             </Grid>
                         </Frame>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
