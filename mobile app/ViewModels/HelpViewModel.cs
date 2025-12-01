@@ -16,32 +16,35 @@ public partial class HelpViewModel : ObservableObject
     {
         Hotlines = new ObservableCollection<HelpResource>
         {
+            // 1. UTS Security (Primary Contact)
             new HelpResource
             {
-                Name = "Talian Kasih (KPWKM)",
-                Description = "National hotline for child, women, and domestic abuse victims in Malaysia.",
-                ContactInfo = "15999",
-                Icon = "📞",
-                AccentColor = "#F44336",
+                Name = "UTS Campus Security",
+                Description = "24/7 Emergency response within campus grounds.",
+                ContactInfo = "084-367300", // Example UTS number
+                Icon = "👮",
+                AccentColor = "#F44336", // Red for emergency
                 Action = "Call"
             },
+            // 2. UTS Counselling
+            new HelpResource
+            {
+                Name = "UTS Counselling Unit",
+                Description = "Student Development & Services Department (SDSD).",
+                ContactInfo = "counselling@uts.edu.my",
+                Icon = "🧠",
+                AccentColor = "#4CAF50", // Green for support
+                Action = "Web" // Or Call
+            },
+            // 3. External Help
             new HelpResource
             {
                 Name = "Befrienders KL",
-                Description = "24-hour emotional support and suicide prevention hotline.",
+                Description = "Emotional support & suicide prevention.",
                 ContactInfo = "03-76272929",
                 Icon = "🤝",
                 AccentColor = "#2196F3",
                 Action = "Call"
-            },
-            new HelpResource
-            {
-                Name = "MCMC (Cyber999)",
-                Description = "Report cyberbullying, internet fraud, and cyber security incidents to CyberSecurity Malaysia.",
-                ContactInfo = "https://www.cyber999.my/",
-                Icon = "🛡️",
-                AccentColor = "#FF9800",
-                Action = "Web"
             }
         };
     }

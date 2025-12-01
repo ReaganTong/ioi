@@ -44,6 +44,9 @@
 		<Compile Update="Views\LessonsPage.xaml.cs">
 			<DependentUpon>LessonsPage.xaml</DependentUpon>
 		</Compile>
+		<Compile Update="Views\ReportPage.xaml.cs">
+		  <DependentUpon>ReportPage.xaml</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -57,18 +60,24 @@
 
 	<ItemGroup>
 		<MauiXaml Remove="Platforms\Windows\App.xaml" />
+		<MauiXaml Remove="Views\ReportPage.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Page Include="Platforms\Windows\App.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
+	  <EmbeddedResource Include="Views\ReportPage.xaml">
+	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.5" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="10.0.11" />
 	</ItemGroup>
 
 </Project>

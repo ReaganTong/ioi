@@ -38,6 +38,12 @@
             ContentTemplate="{DataTemplate views:MorePage}"
             Route="More" />
 
+        <ShellContent
+            Title="Report"
+            Icon="report_icon.png"
+            ContentTemplate="{DataTemplate views:ReportPage}"
+            Route="Report" />
+
     </TabBar>
 
 </Shell>

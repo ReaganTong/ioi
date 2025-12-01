@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
+             xmlns:vm="clr-namespace:mobile_app.ViewModels"
+             x:Class="mobile_app.Views.ReportPage"
+             Title="Report Incident">
+
+    <ContentPage.BindingContext>
+        <vm:ReportViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+            <Label Text="Report an Incident" FontSize="24" FontAttributes="Bold" />
+            <Label Text="Your safety is our priority. This report is confidential." FontSize="14" TextColor="Gray" />
+
+            <Frame BorderColor="Gray" CornerRadius="10" Padding="10">
+                <Editor Placeholder="Describe what happened..." 
+                        Text="{Binding Description}"
+                        HeightRequest="100" />
+            </Frame>
+
+            <Button Text="📷 Attach Photo Evidence"
+                    Command="{Binding PickPhotoCommand}"
+                    BackgroundColor="{StaticResource Secondary}"
+                    TextColor="Black" />
+
+            <Image Source="{Binding EvidenceImage}" 
+                   HeightRequest="200" 
+                   Aspect="AspectFit" 
+                   IsVisible="{Binding EvidenceImage, Converter={StaticResource IsNotNullConverter}}" />
+
+            <Label Text="Incident Location (UTS Campus)" FontSize="16" FontAttributes="Bold" />
+            <Label Text="{Binding LocationLabel}" FontSize="12" TextColor="Blue" />
+
+            <Frame HeightRequest="300" Padding="0" CornerRadius="10" IsClippedToBounds="True">
+                <maps:Map x:Name="IncidentMap"
+              MapType="Street"
+              IsShowingUser="True" />
+            </Frame>
+
+            <Button Text="Submit Report" 
+                    Command="{Binding SubmitReportCommand}" 
+                    BackgroundColor="{StaticResource AlertRed}" 
+                    CornerRadius="25"
+                    HeightRequest="50"
+                    FontSize="18"
+                    FontAttributes="Bold" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -36,6 +36,11 @@ public static class MauiProgram
         builder.Services.AddTransient<HelpPage>();
         builder.Services.AddTransient<LessonDetailPage>();
 
+        // Add this line inside the CreateMauiApp method
+        builder.Services.AddTransient<ReportPage>();
+        builder.Services.AddSingleton<ReportViewModel>();
+        builder.UseMauiMaps(); // <--- CRITICAL for the map to work
+
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
