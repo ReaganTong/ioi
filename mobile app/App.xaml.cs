@@ -10,6 +10,6 @@ public partial class App : Application
     protected override Window CreateWindow(IActivationState? activationState)
     {
         // ✅ This ensures AppShell loads as your root
-        return new Window(new Views.LoginPage());
+        return new Window(new AppShell());
     }
 }

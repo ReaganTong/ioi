@@ -34,16 +34,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Remove="Views\LoginPage.xaml" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EmbeddedResource Include="Views\LoginPage.xaml">
-	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-	  </EmbeddedResource>
-	</ItemGroup>
-
-	<ItemGroup>
 		<Compile Update="Models\Lesson.cs" />
 		<Compile Update="Models\HelpResource.cs" />
 		<Compile Update="ViewModels\LessonViewModel.cs" />
