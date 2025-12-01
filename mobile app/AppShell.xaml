@@ -21,6 +21,12 @@
             Route="Lessons" />
 
         <ShellContent
+            Title="News"
+            Icon="news_icon.png" 
+            ContentTemplate="{DataTemplate views:NewsPage}"
+            Route="News" />
+
+        <ShellContent
             Title="Quizzes"
             Icon="quiz_icon.png"
             ContentTemplate="{DataTemplate views:QuizPage}"

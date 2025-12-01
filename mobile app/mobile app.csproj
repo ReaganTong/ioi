@@ -34,11 +34,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Remove="Views\NewsPage.xaml" />
+	  <MauiXaml Remove="Views\LoginPage.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="Views\NewsPage.xaml">
+	  <EmbeddedResource Include="Views\LoginPage.xaml">
 	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
 	  </EmbeddedResource>
 	</ItemGroup>
@@ -57,25 +57,15 @@
 		<Compile Update="Views\NewsPage.xaml.cs">
 		  <DependentUpon>NewsPage.xaml</DependentUpon>
 		</Compile>
+		<Compile Update="Views\LoginPage.xaml.cs">
+		  <DependentUpon>LoginPage.xaml</DependentUpon>
+		</Compile>
 		<Compile Update="Views\QuizPlayPage.xaml.cs">
 		  <DependentUpon>QuizPlayPage.xaml</DependentUpon>
 		</Compile>
 		<Compile Update="Views\ReportPage.xaml.cs">
 		  <DependentUpon>ReportPage.xaml</DependentUpon>
 		</Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-		<MauiXaml Update="Views\LessonsPage.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
-		<MauiXaml Update="Views\HelpPage.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
-
-		<MauiXaml Update="Views\ReportPage.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -109,6 +99,7 @@
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="10.0.11" />
 		<PackageReference Include="Plugin.LocalNotification" Version="11.1.4" />
+		<PackageReference Include="sqlite-net-pcl" Version="1.10.196-beta" />
 	</ItemGroup>
 
 </Project>

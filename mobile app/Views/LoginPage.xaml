@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:mobile_app.ViewModels"
+             x:Class="mobile_app.Views.LoginPage"
+             BackgroundColor="White">
+
+    <ContentPage.BindingContext>
+        <vm:LoginViewModel />
+    </ContentPage.BindingContext>
+
+    <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+
+        <Image Source="appicon.svg" HeightRequest="150" HorizontalOptions="Center" />
+
+        <Label Text="Welcome Back" 
+               FontSize="28" 
+               FontAttributes="Bold" 
+               HorizontalOptions="Center" 
+               TextColor="#333"/>
+
+        <Entry Placeholder="Username" 
+               Text="{Binding Username}"
+               HeightRequest="50" />
+
+        <Entry Placeholder="Password" 
+               IsPassword="True"
+               Text="{Binding Password}"
+               HeightRequest="50" />
+
+        <Button Text="Login" 
+        Command="{Binding LoginCommand}" 
+        BackgroundColor="{StaticResource PrimaryColor}"  CornerRadius="25" 
+        HeightRequest="50" 
+        FontAttributes="Bold"/>
+
+    </VerticalStackLayout>
+</ContentPage>
