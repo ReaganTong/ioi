@@ -6,6 +6,10 @@
              x:Name="lessonsPage"
              Title="Educational Hub">
 
+    <ContentPage.BindingContext>
+        <viewmodels:LessonViewModel />
+    </ContentPage.BindingContext>
+
     <ScrollView>
         <VerticalStackLayout>
             <Label Text="Types of Bullying" 
