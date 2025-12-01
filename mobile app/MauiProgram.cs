@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm;
 using SkiaSharp.Views.Maui.Controls.Hosting; // 👈 CRITICAL: Required for Mapsui v5
 using mobile_app.ViewModels;
 using mobile_app.Views;
+using Plugin.LocalNotification;
 
 namespace mobile_app;
 
@@ -14,7 +15,9 @@ public static class MauiProgram
 
         builder
             .UseMauiApp<App>()
+            .UseLocalNotification()
             .UseSkiaSharp() // 👈 FIX: Changed from .UseMapsui() to .UseSkiaSharp()
+            
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -27,6 +30,10 @@ public static class MauiProgram
         builder.Services.AddSingleton<HelpViewModel>();
         builder.Services.AddSingleton<ReportViewModel>();
         builder.Services.AddTransient<Views.QuizPlayPage>();
+
+        // Add inside CreateMauiApp
+        builder.Services.AddTransient<NewsViewModel>();
+        builder.Services.AddTransient<Views.NewsPage>();
 
         // Register Views
         builder.Services.AddTransient<MainPage>();

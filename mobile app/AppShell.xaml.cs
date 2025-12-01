@@ -9,5 +9,6 @@ public partial class AppShell : Shell
         // FIX: Register deep-link routes using C#
         Routing.RegisterRoute("LessonDetail", typeof(Views.LessonDetailPage));
         Routing.RegisterRoute("QuizPlay", typeof(Views.QuizPlayPage));
+        Routing.RegisterRoute("NewsPage", typeof(Views.NewsPage));
     }
 }

@@ -34,6 +34,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Remove="Views\NewsPage.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Views\NewsPage.xaml">
+	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
 		<Compile Update="Models\Lesson.cs" />
 		<Compile Update="Models\HelpResource.cs" />
 		<Compile Update="ViewModels\LessonViewModel.cs" />
@@ -43,6 +53,9 @@
 		</Compile>
 		<Compile Update="Views\LessonsPage.xaml.cs">
 			<DependentUpon>LessonsPage.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\NewsPage.xaml.cs">
+		  <DependentUpon>NewsPage.xaml</DependentUpon>
 		</Compile>
 		<Compile Update="Views\QuizPlayPage.xaml.cs">
 		  <DependentUpon>QuizPlayPage.xaml</DependentUpon>
@@ -63,20 +76,31 @@
 		<MauiXaml Update="Views\ReportPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+		
+		<MauiXaml Update="Views\LessonsPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		
+		<MauiXaml Update="Views\HelpPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		
+		<MauiXaml Update="Views\ReportPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+
+		<MauiXaml Update="Views\QuizPlayPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		
+		<MauiXaml Update="Views\NewsPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		
 	</ItemGroup>
-
-	<ItemGroup>
-		<MauiXaml Remove="Platforms\Windows\App.xaml" />
-		<MauiXaml Remove="Views\QuizPlayPage.xaml" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EmbeddedResource Include="Views\QuizPlayPage.xaml">
-	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-	  </EmbeddedResource>
-	</ItemGroup>
-
 
 	<ItemGroup>
 		<PackageReference Include="Mapsui.Maui" Version="5.0.0" />
@@ -84,6 +108,7 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.5" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="10.0.11" />
+		<PackageReference Include="Plugin.LocalNotification" Version="11.1.4" />
 	</ItemGroup>
 
 </Project>

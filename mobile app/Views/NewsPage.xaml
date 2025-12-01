@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:mobile_app.ViewModels"
+             x:Class="mobile_app.Views.NewsPage"
+             Title="Awareness Feed">
+
+    <ContentPage.BindingContext>
+        <vm:NewsViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="Auto, *">
+        <Button Text="🔔 Simulate New Alert" 
+                Command="{Binding SimulateNotificationCommand}"
+                BackgroundColor="Orange"
+                TextColor="Black"
+                Margin="15"/>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding NewsList}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="10,5" Padding="15" BackgroundColor="{Binding Color}" CornerRadius="10">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Title}" FontSize="18" FontAttributes="Bold" TextColor="Black"/>
+                            <Label Text="{Binding Date}" FontSize="12" TextColor="Gray"/>
+                            <Label Text="{Binding Description}" FontSize="14" TextColor="#333" Margin="0,5,0,0"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

@@ -32,9 +32,9 @@
             </Frame>
 
             <Button Text="📷 Attach Photo Evidence"
-                    Command="{Binding PickPhotoCommand}"
-                    BackgroundColor="{StaticResource SecondaryColor}" 
-                    TextColor="Black" />
+                Command="{Binding PickPhotoCommand}" 
+                BackgroundColor="{StaticResource SecondaryColor}" 
+                TextColor="Black" />
 
             <Image Source="{Binding EvidenceImage}" 
                    HeightRequest="200" 

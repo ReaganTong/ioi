@@ -42,6 +42,8 @@
                     </VisualStateGroupList>
                 </Setter>
             </Style>
+            
+            
 
             <Style TargetType="Frame" x:Key="CardFrameStyle">
                 <Setter Property="CornerRadius" Value="12" />

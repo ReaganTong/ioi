@@ -26,16 +26,50 @@ public partial class ReportViewModel : ObservableObject
 
     // Command to Pick Photo (Requirement E4)
     [RelayCommand]
-    private async Task CallSecurity()
+    private async Task PickPhoto()
     {
-        if (PhoneDialer.Default.IsSupported)
+        try
         {
-            // Example UTS Security Number
-            PhoneDialer.Default.Open("084367300");
+            // 1. Ask user: Camera or Gallery?
+            string action = await Shell.Current.DisplayActionSheet("Add Evidence", "Cancel", null, "Take Photo", "Choose from Gallery");
+
+            if (action == "Cancel") return;
+
+            FileResult? photo = null;
+
+            // 2. Execute Camera or Gallery logic
+            if (action == "Take Photo")
+            {
+                if (MediaPicker.Default.IsCaptureSupported)
+                {
+                    photo = await MediaPicker.Default.CapturePhotoAsync();
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Error", "Camera not supported on this device.", "OK");
+                    return;
+                }
+            }
+            else if (action == "Choose from Gallery")
+            {
+                photo = await MediaPicker.Default.PickPhotoAsync();
+            }
+
+            // 3. Process the result
+            if (photo != null)
+            {
+                // Save the file object (for later upload/saving to DB)
+                _photoFile = photo;
+
+                // Create a stream to display the image in the UI
+                var stream = await photo.OpenReadAsync();
+                EvidenceImage = ImageSource.FromStream(() => stream);
+            }
         }
-        else
+        catch (Exception ex)
         {
-            await Shell.Current.DisplayAlert("Error", "Phone dialer not supported.", "OK");
+            // Handle permission errors or cancellations
+            await Shell.Current.DisplayAlert("Error", $"Could not pick photo: {ex.Message}", "OK");
         }
     }
 
