@@ -20,7 +20,8 @@
                    TextColor="{StaticResource Gray600}" />
 
             <CollectionView ItemsSource="{Binding Lessons}"
-                            SelectionMode="None"
+                            SelectionMode="Single"
+                            SelectionChanged="OnSelectionChanged"
                             Margin="10, 0">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
@@ -28,12 +29,6 @@
                                Margin="10, 5"
                                BackgroundColor="{Binding Color}"
                                Padding="0">
-
-                            <Frame.GestureRecognizers>
-                                <TapGestureRecognizer 
-                                    Command="{Binding Source={x:Reference lessonsPage}, Path=BindingContext.GoToDetailsCommand}"
-                                    CommandParameter="{Binding .}" />
-                            </Frame.GestureRecognizers>
 
                             <Grid ColumnDefinitions="70, *" Padding="15">
                                 <Label Text="{Binding Icon}" 

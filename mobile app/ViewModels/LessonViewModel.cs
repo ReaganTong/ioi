@@ -106,7 +106,14 @@ public partial class LessonViewModel : ObservableObject
     [RelayCommand]
     private async Task GoToDetails(Lesson lesson)
     {
-        // Navigate and pass the Title as a parameter
-        await Shell.Current.GoToAsync($"{lesson.Route}?Title={lesson.Title}");
+        if (lesson == null) return;
+
+        // Use a Dictionary to safely pass parameters (handles spaces automatically)
+        var navigationParameter = new Dictionary<string, object>
+    {
+        { "Title", lesson.Title }
+    };
+
+        await Shell.Current.GoToAsync(lesson.Route, navigationParameter);
     }
 }
