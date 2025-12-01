@@ -1,4 +1,6 @@
-﻿namespace mobile_app.Models;
+﻿using System.Collections.Generic; // Required for List
+
+namespace mobile_app.Models;
 
 public class Quiz
 {
@@ -6,5 +8,7 @@ public class Quiz
     public string? Description { get; set; }
     public string? Icon { get; set; }
     public string? Color { get; set; }
-}
 
+    // This was missing!
+    public List<Question> Questions { get; set; } = new();
+}

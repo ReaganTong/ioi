@@ -3,13 +3,16 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.Devices.Sensors;
 using Microsoft.Maui.Media;
 using System.Collections.ObjectModel;
+using Microsoft.Maui.ApplicationModel; // For PhoneDialer
+using Microsoft.Maui.Devices.Sensors;
+using Microsoft.Maui.Media;
 
 namespace mobile_app.ViewModels;
 
 public partial class ReportViewModel : ObservableObject
 {
     [ObservableProperty]
-    private string description;
+    private string description = string.Empty;
 
     [ObservableProperty]
     private ImageSource? evidenceImage;
@@ -23,21 +26,16 @@ public partial class ReportViewModel : ObservableObject
 
     // Command to Pick Photo (Requirement E4)
     [RelayCommand]
-    private async Task PickPhoto()
+    private async Task CallSecurity()
     {
-        try
+        if (PhoneDialer.Default.IsSupported)
         {
-            var photo = await MediaPicker.Default.CapturePhotoAsync();
-            if (photo != null)
-            {
-                var stream = await photo.OpenReadAsync();
-                EvidenceImage = ImageSource.FromStream(() => stream);
-                _photoFile = photo;
-            }
+            // Example UTS Security Number
+            PhoneDialer.Default.Open("084367300");
         }
-        catch (Exception)
+        else
         {
-            // Handle permission errors
+            await Shell.Current.DisplayAlert("Error", "Phone dialer not supported.", "OK");
         }
     }
 

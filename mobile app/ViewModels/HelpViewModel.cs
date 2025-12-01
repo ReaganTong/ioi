@@ -21,7 +21,7 @@ public partial class HelpViewModel : ObservableObject
             {
                 Name = "UTS Campus Security",
                 Description = "24/7 Emergency response within campus grounds.",
-                ContactInfo = "084-367300", // Example UTS number
+                ContactInfo = "082-260991", // Example UTS number
                 Icon = "👮",
                 AccentColor = "#F44336", // Red for emergency
                 Action = "Call"
@@ -30,11 +30,11 @@ public partial class HelpViewModel : ObservableObject
             new HelpResource
             {
                 Name = "UTS Counselling Unit",
-                Description = "Student Development & Services Department (SDSD).",
-                ContactInfo = "counselling@uts.edu.my",
+                Description = "Mdm Hamidah / Mr Kevin.",
+                ContactInfo = "hamidahrapee@uts.edu.my / kevin@uts.edu.my",
                 Icon = "🧠",
                 AccentColor = "#4CAF50", // Green for support
-                Action = "Web" // Or Call
+                Action = "Contact" // Or Call
             },
             // 3. External Help
             new HelpResource
@@ -52,26 +52,23 @@ public partial class HelpViewModel : ObservableObject
     [RelayCommand]
     private static async Task PerformAction(HelpResource resource)
     {
+        // Fix: Safety check for null contact info
+        if (string.IsNullOrWhiteSpace(resource.ContactInfo))
+        {
+            await Shell.Current.DisplayAlert("Error", "No contact info available.", "OK");
+            return;
+        }
+
         if (resource.Action == "Call")
         {
             if (PhoneDialer.Default.IsSupported)
             {
+                // Now safe to use because we checked for null above
                 PhoneDialer.Default.Open(resource.ContactInfo);
             }
             else
             {
-                await Shell.Current.DisplayAlert("Feature Not Supported", $"Please manually call: {resource.ContactInfo}", "OK");
-            }
-        }
-        else if (resource.Action == "Web")
-        {
-            if (await Launcher.Default.CanOpenAsync(resource.ContactInfo!))
-            {
-                await Launcher.Default.OpenAsync(resource.ContactInfo!);
-            }
-            else
-            {
-                await Shell.Current.DisplayAlert("Error", $"Could not open the link: {resource.ContactInfo}", "OK");
+                await Shell.Current.DisplayAlert("Not Supported", $"Manual call: {resource.ContactInfo}", "OK");
             }
         }
     }

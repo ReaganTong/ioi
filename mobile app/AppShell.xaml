@@ -9,10 +9,10 @@
 
     <TabBar>
         <ShellContent
-            Title="Home"
-            Icon="home_icon.png" 
-            ContentTemplate="{DataTemplate views:MainPage}"
-            Route="Home" />
+            Title="Report"
+            Icon="report_icon.png"
+            ContentTemplate="{DataTemplate views:ReportPage}"
+            Route="Report" />
 
         <ShellContent
             Title="Learn"
@@ -31,19 +31,5 @@
             Icon="support_icon.png"
             ContentTemplate="{DataTemplate views:HelpPage}"
             Route="Help" />
-
-        <ShellContent
-            Title="More"
-            Icon="more_icon.png"
-            ContentTemplate="{DataTemplate views:MorePage}"
-            Route="More" />
-
-        <ShellContent
-            Title="Report"
-            Icon="report_icon.png"
-            ContentTemplate="{DataTemplate views:ReportPage}"
-            Route="Report" />
-
     </TabBar>
-
 </Shell>

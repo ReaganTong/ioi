@@ -56,24 +56,20 @@
 		<MauiXaml Update="Views\HelpPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
-	</ItemGroup>
 
-	<ItemGroup>
-		<MauiXaml Remove="Platforms\Windows\App.xaml" />
-		<MauiXaml Remove="Views\ReportPage.xaml" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EmbeddedResource Include="Views\ReportPage.xaml">
-	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-	  </EmbeddedResource>
-	</ItemGroup>
-
-	<ItemGroup>
+		<MauiXaml Update="Views\ReportPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		
 	</ItemGroup>
 
 	<ItemGroup>
+		<MauiXaml Remove="Platforms\Windows\App.xaml" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="Mapsui.Maui" Version="5.0.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.5" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />

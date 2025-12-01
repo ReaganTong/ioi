@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection; // ADDED
 using mobile_app.Views; // ADDED
 using mobile_app.ViewModels; // ADDED
 using CommunityToolkit.Mvvm; // ADDED (ensure csproj is updated)
+using SkiaSharp.Views.Maui.Controls.Hosting; // Mapsui depends on SkiaSharp
+using Mapsui.UI.Maui; // ADD THIS
 
 namespace mobile_app;
 
@@ -16,6 +18,8 @@ public static class MauiProgram
 
         builder
             .UseMauiApp<App>()
+            // 👇 ADD THIS LINE HERE 👇
+            .UseMapsui()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

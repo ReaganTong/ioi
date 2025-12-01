@@ -1,36 +1,46 @@
-﻿// mobile app/Views/LessonDetailPage.xaml.cs
-using Microsoft.Maui.Controls;
+﻿using mobile_app.Models;
+using mobile_app.ViewModels;
 
 namespace mobile_app.Views;
 
-// FIX: Added 'partial' keyword
 [QueryProperty(nameof(LessonTitle), "Title")]
 public partial class LessonDetailPage : ContentPage
 {
+    private readonly LessonViewModel _viewModel;
     public string? LessonTitle { get; set; }
 
-    public LessonDetailPage()
+    // Inject the ViewModel to access the list of lessons
+    public LessonDetailPage(LessonViewModel viewModel)
     {
         InitializeComponent();
+        _viewModel = viewModel;
     }
 
-    // Handler for the "Get Help Now" button (Navigate to Help Tab)
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (!string.IsNullOrEmpty(LessonTitle))
+        {
+            // Find the lesson that matches the Title passed from the previous page
+            var selectedLesson = _viewModel.Lessons.FirstOrDefault(l => l.Title == LessonTitle);
+
+            // Set the BindingContext to this specific lesson so the XAML can display its data
+            if (selectedLesson != null)
+            {
+                BindingContext = selectedLesson;
+            }
+        }
+    }
+
     private async void OnGetHelpClicked(object sender, EventArgs e)
     {
         await Shell.Current.GoToAsync("//Help");
     }
 
-    // Handler for the "Mark as Complete" button
     private async void OnMarkCompleteClicked(object sender, EventArgs e)
     {
-        await Shell.Current.DisplayAlert("Lesson Complete", $"You have finished the lesson on {LessonTitle ?? "bullying"}. Keep up the great work!", "Awesome!");
+        await Shell.Current.DisplayAlert("Great Job!", "You've completed this lesson.", "OK");
         await Shell.Current.GoToAsync("//Lessons");
-    }
-
-    // Update the actual page Title property in OnAppearing for UI consistency
-    protected override void OnAppearing()
-    {
-        base.OnAppearing();
-        this.Title = $"Lesson: {this.LessonTitle ?? "Details"}";
     }
 }

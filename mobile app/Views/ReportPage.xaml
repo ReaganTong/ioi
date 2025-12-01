@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
+             xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
              xmlns:vm="clr-namespace:mobile_app.ViewModels"
              x:Class="mobile_app.Views.ReportPage"
              Title="Report Incident">
@@ -12,8 +12,18 @@
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
+
+            <Button Text="📞 Call UTS Security"
+                    Command="{Binding CallSecurityCommand}"
+                    BackgroundColor="#F44336"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    HeightRequest="50"
+                    CornerRadius="25"
+                    Margin="0,0,0,10"/>
+
             <Label Text="Report an Incident" FontSize="24" FontAttributes="Bold" />
-            <Label Text="Your safety is our priority. This report is confidential." FontSize="14" TextColor="Gray" />
+            <Label Text="Tap the map to set the location." FontSize="14" TextColor="Gray" />
 
             <Frame BorderColor="Gray" CornerRadius="10" Padding="10">
                 <Editor Placeholder="Describe what happened..." 
@@ -31,13 +41,13 @@
                    Aspect="AspectFit" 
                    IsVisible="{Binding EvidenceImage, Converter={StaticResource IsNotNullConverter}}" />
 
-            <Label Text="Incident Location (UTS Campus)" FontSize="16" FontAttributes="Bold" />
             <Label Text="{Binding LocationLabel}" FontSize="12" TextColor="Blue" />
 
             <Frame HeightRequest="300" Padding="0" CornerRadius="10" IsClippedToBounds="True">
-                <maps:Map x:Name="IncidentMap"
-              MapType="Street"
-              IsShowingUser="True" />
+                <mapsui:MapView x:Name="MyMap"
+                                IsMyLocationButtonVisible="False"
+                                IsNorthingButtonVisible="False"
+                                IsZoomButtonVisible="True" />
             </Frame>
 
             <Button Text="Submit Report" 
