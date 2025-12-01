@@ -91,15 +91,15 @@
 		<MauiXaml Update="Views\ReportPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
-
+		
 		<MauiXaml Update="Views\QuizPlayPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
-		
+
 		<MauiXaml Update="Views\NewsPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
-		
+
 	</ItemGroup>
 
 	<ItemGroup>
