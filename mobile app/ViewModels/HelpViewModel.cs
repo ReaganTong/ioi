@@ -39,9 +39,9 @@ public partial class HelpViewModel : ObservableObject
             // 3. External Help
             new HelpResource
             {
-                Name = "Befrienders KL",
-                Description = "Emotional support & suicide prevention.",
-                ContactInfo = "03-76272929",
+                Name = "Befrienders Kuching",
+                Description = "sam@befrienderskch.org.my",
+                ContactInfo = "082-242 800",
                 Icon = "🤝",
                 AccentColor = "#2196F3",
                 Action = "Call"

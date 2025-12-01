@@ -1,9 +1,13 @@
 ﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input; // Required for RelayCommand
 using mobile_app.Models;
+using Microsoft.Maui.Controls;
+using System.Threading.Tasks;
 
 namespace mobile_app.ViewModels;
 
-public class QuizViewModel
+public partial class QuizViewModel : ObservableObject // changed to partial and inherit from ObservableObject
 {
     // FIX 1: Ensure this property exists directly inside the class
     public ObservableCollection<Quiz> Quizzes { get; set; }
@@ -57,5 +61,15 @@ public class QuizViewModel
                 }
             }
         };
+    }
+
+    // This is the method you asked to add
+    [RelayCommand]
+    private async Task PlayQuiz(Quiz quiz)
+    {
+        if (quiz == null) return;
+
+        // Navigate to the playing page and pass the Quiz Title
+        await Shell.Current.GoToAsync($"QuizPlay?Title={quiz.Title}");
     }
 }

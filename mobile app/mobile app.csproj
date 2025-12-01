@@ -44,6 +44,9 @@
 		<Compile Update="Views\LessonsPage.xaml.cs">
 			<DependentUpon>LessonsPage.xaml</DependentUpon>
 		</Compile>
+		<Compile Update="Views\QuizPlayPage.xaml.cs">
+		  <DependentUpon>QuizPlayPage.xaml</DependentUpon>
+		</Compile>
 		<Compile Update="Views\ReportPage.xaml.cs">
 		  <DependentUpon>ReportPage.xaml</DependentUpon>
 		</Compile>
@@ -65,6 +68,13 @@
 
 	<ItemGroup>
 		<MauiXaml Remove="Platforms\Windows\App.xaml" />
+		<MauiXaml Remove="Views\QuizPlayPage.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Views\QuizPlayPage.xaml">
+	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	  </EmbeddedResource>
 	</ItemGroup>
 
 

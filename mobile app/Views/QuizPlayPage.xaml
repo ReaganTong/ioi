@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="mobile_app.Views.QuizPlayPage"
+             Title="Playing Quiz"
+             BackgroundColor="White">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20" VerticalOptions="Center">
+
+            <!-- Question Counter -->
+            <Label x:Name="lblProgress" 
+                   Text="Question 1 of 5" 
+                   TextColor="Gray" 
+                   HorizontalOptions="Center" />
+
+            <!-- The Question -->
+            <Frame BackgroundColor="{StaticResource PrimaryColor}" CornerRadius="15" Padding="20">
+                <Label x:Name="lblQuestion"
+                       Text="Loading question..."
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalTextAlignment="Center" />
+            </Frame>
+
+            <!-- Options -->
+            <!-- IMPORTANT: x:Name is what allows the C# code to find these buttons -->
+            <Button x:Name="btnOption1" Clicked="OnAnswerClicked" Style="{StaticResource PrimaryButton}" Margin="0,5"/>
+            <Button x:Name="btnOption2" Clicked="OnAnswerClicked" Style="{StaticResource PrimaryButton}" Margin="0,5"/>
+            <Button x:Name="btnOption3" Clicked="OnAnswerClicked" Style="{StaticResource PrimaryButton}" Margin="0,5"/>
+
+            <!-- Result Feedback -->
+            <Label x:Name="lblFeedback"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   IsVisible="False" />
+
+            <!-- Next Button (Hidden initially) -->
+            <Button x:Name="btnNext"
+                    Text="Next Question ➡"
+                    BackgroundColor="Black"
+                    TextColor="White"
+                    Clicked="OnNextClicked"
+                    IsVisible="False" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

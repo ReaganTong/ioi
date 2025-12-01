@@ -26,6 +26,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<LessonViewModel>();
         builder.Services.AddSingleton<HelpViewModel>();
         builder.Services.AddSingleton<ReportViewModel>();
+        builder.Services.AddTransient<Views.QuizPlayPage>();
 
         // Register Views
         builder.Services.AddTransient<MainPage>();

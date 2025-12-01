@@ -28,27 +28,29 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame Style="{StaticResource CardFrameStyle}" 
-                               Margin="10, 5"
-                               BackgroundColor="{Binding Color}">
+               Margin="10, 5"
+               BackgroundColor="{Binding Color}"
+               Padding="0">
                             <Frame.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LessonViewModel}}, Path=GoToDetailsCommand}" 
-                                                      CommandParameter="{Binding .}" />
+                                <TapGestureRecognizer 
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LessonViewModel}}, Path=GoToDetailsCommand}"
+                    CommandParameter="{Binding .}" />
                             </Frame.GestureRecognizers>
 
-                            <Grid ColumnDefinitions="50, *" ColumnSpacing="15" Padding="5">
+                            <Grid ColumnDefinitions="70, *" Padding="15">
                                 <Label Text="{Binding Icon}" 
-                                       FontSize="30" 
-                                       VerticalOptions="Center" 
-                                       HorizontalOptions="Center" />
+                       FontSize="40" 
+                       VerticalOptions="Center" 
+                       HorizontalOptions="Center" />
 
-                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="5">
                                     <Label Text="{Binding Title}" 
-                                           FontAttributes="Bold" 
-                                           FontSize="18" 
-                                           TextColor="White" />
+                           FontAttributes="Bold" 
+                           FontSize="18" 
+                           TextColor="White" />
                                     <Label Text="{Binding ShortDescription}" 
-                                           FontSize="14" 
-                                           TextColor="#EEEEEE" />
+                           FontSize="13" 
+                           TextColor="#F0F0F0" />
                                 </VerticalStackLayout>
                             </Grid>
                         </Frame>
