@@ -33,7 +33,7 @@
 
             <Button Text="📷 Attach Photo Evidence"
                     Command="{Binding PickPhotoCommand}"
-                    BackgroundColor="{StaticResource Secondary}"
+                    BackgroundColor="{StaticResource SecondaryColor}" 
                     TextColor="Black" />
 
             <Image Source="{Binding EvidenceImage}" 

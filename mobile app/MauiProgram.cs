@@ -1,12 +1,8 @@
-﻿using Microsoft.Maui;
-using Microsoft.Maui.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection; // ADDED
-using mobile_app.Views; // ADDED
-using mobile_app.ViewModels; // ADDED
-using CommunityToolkit.Mvvm; // ADDED (ensure csproj is updated)
-using SkiaSharp.Views.Maui.Controls.Hosting; // Mapsui depends on SkiaSharp
-using Mapsui.UI.Maui; // ADD THIS
+﻿using Microsoft.Extensions.Logging;
+using CommunityToolkit.Mvvm;
+using SkiaSharp.Views.Maui.Controls.Hosting; // 👈 CRITICAL: Required for Mapsui v5
+using mobile_app.ViewModels;
+using mobile_app.Views;
 
 namespace mobile_app;
 
@@ -18,32 +14,27 @@ public static class MauiProgram
 
         builder
             .UseMauiApp<App>()
-            // 👇 ADD THIS LINE HERE 👇
-            .UseMapsui()
+            .UseSkiaSharp() // 👈 FIX: Changed from .UseMapsui() to .UseSkiaSharp()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        // 🌟 Dependency Injection Registration
-        // ViewModels (Singleton lifespan for data across the app)
+        // Register Services
         builder.Services.AddSingleton<QuizViewModel>();
         builder.Services.AddSingleton<LessonViewModel>();
         builder.Services.AddSingleton<HelpViewModel>();
+        builder.Services.AddSingleton<ReportViewModel>();
 
-        // Pages/Views (Transient lifespan, especially for detailed views)
+        // Register Views
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddTransient<QuizPage>();
         builder.Services.AddTransient<MorePage>();
         builder.Services.AddTransient<LessonsPage>();
         builder.Services.AddTransient<HelpPage>();
         builder.Services.AddTransient<LessonDetailPage>();
-
-        // Add this line inside the CreateMauiApp method
         builder.Services.AddTransient<ReportPage>();
-        builder.Services.AddSingleton<ReportViewModel>();
-        builder.UseMauiMaps(); // <--- CRITICAL for the map to work
 
 #if DEBUG
         builder.Logging.AddDebug();
