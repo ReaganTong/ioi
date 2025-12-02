@@ -18,9 +18,9 @@
                    FontSize="14"
                    Margin="20, 5, 20, 15" 
                    TextColor="{StaticResource Gray600}" />
-
             <CollectionView ItemsSource="{Binding Lessons}"
                 Margin="10, 0">
+
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame Style="{StaticResource CardFrameStyle}" 
@@ -30,8 +30,9 @@
 
                             <Frame.GestureRecognizers>
                                 <TapGestureRecognizer 
-                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LessonViewModel}}, Path=GoToDetailsCommand}"
-                        CommandParameter="{Binding .}" />
+                        Command="{Binding BindingContext.GoToDetailsCommand, Source={x:Reference lessonsPage}}"
+                        CommandParameter="{Binding .}"
+                        NumberOfTapsRequired="1" />
                             </Frame.GestureRecognizers>
 
                             <Grid ColumnDefinitions="70, *" Padding="15">
