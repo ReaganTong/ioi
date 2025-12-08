@@ -3,14 +3,15 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.Devices.Sensors;
 using Microsoft.Maui.Media;
 using System.Collections.ObjectModel;
-using Microsoft.Maui.ApplicationModel; // For PhoneDialer
-using Microsoft.Maui.Devices.Sensors;
-using Microsoft.Maui.Media;
+using Microsoft.Maui.ApplicationModel;
+using System.Threading.Tasks;
 
 namespace mobile_app.ViewModels;
 
 public partial class ReportViewModel : ObservableObject
 {
+    private const string SecurityContact = "082-260991";
+
     [ObservableProperty]
     private string description = string.Empty;
 
@@ -18,62 +19,104 @@ public partial class ReportViewModel : ObservableObject
     private ImageSource? evidenceImage;
 
     [ObservableProperty]
-    private string locationLabel = "Tap map to pin location";
+    private string locationLabel = "No location set";
 
     private FileResult? _photoFile;
     public double Latitude { get; set; }
     public double Longitude { get; set; }
 
-    // Command to Pick Photo (Requirement E4)
+    // NEW: Command to get device GPS location
+    [RelayCommand]
+    private async Task GetCurrentLocation()
+    {
+        try
+        {
+            LocationLabel = "Getting location...";
+
+            // Check permissions first (omitted for brevity, handled by OS usually)
+            var location = await Geolocation.Default.GetLastKnownLocationAsync();
+
+            if (location == null)
+            {
+                location = await Geolocation.Default.GetLocationAsync(new GeolocationRequest
+                {
+                    DesiredAccuracy = GeolocationAccuracy.Medium,
+                    Timeout = TimeSpan.FromSeconds(30)
+                });
+            }
+
+            if (location != null)
+            {
+                Latitude = location.Latitude;
+                Longitude = location.Longitude;
+                LocationLabel = $"📍 Location set: {Latitude:F4}, {Longitude:F4}";
+            }
+            else
+            {
+                LocationLabel = "Unable to get location";
+            }
+        }
+        catch (Exception ex)
+        {
+            LocationLabel = $"Error: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private async Task CallSecurity()
+    {
+        try
+        {
+            PhoneDialer.Default.Open(SecurityContact);
+        }
+        catch (Exception)
+        {
+            try
+            {
+                await Launcher.Default.OpenAsync($"tel:{SecurityContact}");
+            }
+            catch
+            {
+                await Shell.Current.DisplayAlert("Action Failed",
+                    $"Could not open dialer. Please manually call UTS Security: {SecurityContact}", "OK");
+            }
+        }
+    }
+
     [RelayCommand]
     private async Task PickPhoto()
     {
         try
         {
-            // 1. Ask user: Camera or Gallery?
             string action = await Shell.Current.DisplayActionSheet("Add Evidence", "Cancel", null, "Take Photo", "Choose from Gallery");
-
             if (action == "Cancel") return;
 
             FileResult? photo = null;
-
-            // 2. Execute Camera or Gallery logic
             if (action == "Take Photo")
             {
                 if (MediaPicker.Default.IsCaptureSupported)
-                {
                     photo = await MediaPicker.Default.CapturePhotoAsync();
-                }
                 else
-                {
-                    await Shell.Current.DisplayAlert("Error", "Camera not supported on this device.", "OK");
-                    return;
-                }
+                    await Shell.Current.DisplayAlert("Error", "Camera not supported", "OK");
             }
             else if (action == "Choose from Gallery")
             {
                 photo = await MediaPicker.Default.PickPhotoAsync();
             }
 
-            // 3. Process the result
             if (photo != null)
             {
-                // Save the file object (for later upload/saving to DB)
                 _photoFile = photo;
-
-                // Create a stream to display the image in the UI
                 var stream = await photo.OpenReadAsync();
                 EvidenceImage = ImageSource.FromStream(() => stream);
             }
         }
         catch (Exception ex)
         {
-            // Handle permission errors or cancellations
             await Shell.Current.DisplayAlert("Error", $"Could not pick photo: {ex.Message}", "OK");
         }
     }
 
-    // Command to Submit Report
     [RelayCommand]
     private async Task SubmitReport()
     {
@@ -83,13 +126,11 @@ public partial class ReportViewModel : ObservableObject
             return;
         }
 
-        // Logic to send data to your Backend would go here
-        // For now, we simulate a submission
-        await Shell.Current.DisplayAlert("Report Sent", $"Incident at {Latitude}, {Longitude} reported to UTS Security.", "OK");
+        // Logic to send data to backend...
+        await Shell.Current.DisplayAlert("Report Sent", $"Incident reported at {LocationLabel}", "OK");
 
-        // Reset form
         Description = string.Empty;
         EvidenceImage = null;
-        LocationLabel = "Tap map to pin location";
+        LocationLabel = "No location set";
     }
 }
