@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using CommunityToolkit.Mvvm;
-using SkiaSharp.Views.Maui.Controls.Hosting; // 👈 CRITICAL: Required for Mapsui v5
 using mobile_app.ViewModels;
 using mobile_app.Views;
 using Plugin.LocalNotification;
@@ -16,8 +15,7 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseLocalNotification()
-            .UseSkiaSharp() // 👈 FIX: Changed from .UseMapsui() to .UseSkiaSharp()
-            
+            // .UseSkiaSharp() <-- REMOVED this line because you uninstalled the package
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -31,7 +29,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ReportViewModel>();
         builder.Services.AddTransient<Views.QuizPlayPage>();
 
-        // Add inside CreateMauiApp
+        // Register News Service
         builder.Services.AddTransient<NewsViewModel>();
         builder.Services.AddTransient<Views.NewsPage>();
 
