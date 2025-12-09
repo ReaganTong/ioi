@@ -15,25 +15,43 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseLocalNotification()
-            // .UseSkiaSharp() <-- REMOVED this line because you uninstalled the package
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
+        // FIX: Advanced WebView Settings for Android
+        // 1. Enable DOM Storage (Critical for maps)
+        // 2. Enable Mixed Content (Critical for loading all map tiles)
+#if ANDROID
+        Microsoft.Maui.Handlers.WebViewHandler.Mapper.AppendToMapping("EnhancedWebView", (handler, view) =>
+        {
+            if (handler.PlatformView != null)
+            {
+                handler.PlatformView.Settings.JavaScriptEnabled = true;
+                handler.PlatformView.Settings.DomStorageEnabled = true;
+                handler.PlatformView.Settings.AllowFileAccess = true;
+                
+                // FIXED: The correct enum is 'MixedContentHandling', not 'MixedContentMode'
+                handler.PlatformView.Settings.MixedContentMode = Android.Webkit.MixedContentHandling.AlwaysAllow;
+                
+                // Ensures 3D content (WebGL) renders correctly
+                handler.PlatformView.Settings.MediaPlaybackRequiresUserGesture = false;
+            }
+        });
+#endif
+
         // Register Services
         builder.Services.AddSingleton<QuizViewModel>();
         builder.Services.AddSingleton<LessonViewModel>();
         builder.Services.AddSingleton<HelpViewModel>();
         builder.Services.AddSingleton<ReportViewModel>();
-        builder.Services.AddTransient<Views.QuizPlayPage>();
 
-        // Register News Service
+        builder.Services.AddTransient<Views.QuizPlayPage>();
         builder.Services.AddTransient<NewsViewModel>();
         builder.Services.AddTransient<Views.NewsPage>();
 
-        // Register Views
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddTransient<QuizPage>();
         builder.Services.AddTransient<MorePage>();
