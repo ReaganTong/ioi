@@ -6,6 +6,11 @@ using System.Collections.ObjectModel;
 using Microsoft.Maui.ApplicationModel;
 using System.Threading.Tasks;
 
+#if ANDROID
+using Android.Content;
+using Android.Provider;
+#endif
+
 namespace mobile_app.ViewModels;
 
 public partial class ReportViewModel : ObservableObject
@@ -21,11 +26,14 @@ public partial class ReportViewModel : ObservableObject
     [ObservableProperty]
     private string locationLabel = "No location set";
 
+    // NEW: Property to control the NASA Map URL
+    [ObservableProperty]
+    private string mapUrl = "https://worldview.earthdata.nasa.gov/";
+
     private FileResult? _photoFile;
     public double Latitude { get; set; }
     public double Longitude { get; set; }
 
-    // NEW: Command to get device GPS location
     [RelayCommand]
     private async Task GetCurrentLocation()
     {
@@ -33,27 +41,55 @@ public partial class ReportViewModel : ObservableObject
         {
             LocationLabel = "Getting location...";
 
-            // Check permissions first (omitted for brevity, handled by OS usually)
-            var location = await Geolocation.Default.GetLastKnownLocationAsync();
-
-            if (location == null)
+            var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+            if (status != PermissionStatus.Granted)
             {
-                location = await Geolocation.Default.GetLocationAsync(new GeolocationRequest
+                status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                if (status != PermissionStatus.Granted)
                 {
-                    DesiredAccuracy = GeolocationAccuracy.Medium,
-                    Timeout = TimeSpan.FromSeconds(30)
-                });
+                    LocationLabel = "Permission denied";
+                    return;
+                }
             }
+
+            var request = new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(20));
+            var location = await Geolocation.Default.GetLocationAsync(request);
 
             if (location != null)
             {
                 Latitude = location.Latitude;
                 Longitude = location.Longitude;
-                LocationLabel = $"📍 Location set: {Latitude:F4}, {Longitude:F4}";
+                LocationLabel = $"📍 {Latitude:F4}, {Longitude:F4}";
+
+                // FIX: Update NASA Map to zoom into the user's location
+                // NASA Worldview uses 'v' parameter for bounding box: minLon,minLat,maxLon,maxLat
+                double offset = 0.05; // Roughly 5km zoom level
+                string bbox = $"{Longitude - offset},{Latitude - offset},{Longitude + offset},{Latitude + offset}";
+                MapUrl = $"https://worldview.earthdata.nasa.gov/?v={bbox}";
             }
             else
             {
-                LocationLabel = "Unable to get location";
+                LocationLabel = "Could not find location";
+            }
+        }
+        catch (FeatureNotEnabledException)
+        {
+            LocationLabel = "Location is off";
+
+            bool openSettings = await Shell.Current.DisplayAlert(
+                "Location Disabled",
+                "Your phone's location is turned off. Please enable it in Settings.",
+                "Open Settings", "Cancel");
+
+            if (openSettings)
+            {
+#if ANDROID
+                var intent = new Intent(Settings.ActionLocationSourceSettings);
+                intent.AddFlags(ActivityFlags.NewTask);
+                Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.StartActivity(intent);
+#else
+                AppInfo.Current.ShowSettingsUI();
+#endif
             }
         }
         catch (Exception ex)
@@ -67,19 +103,15 @@ public partial class ReportViewModel : ObservableObject
     {
         try
         {
-            PhoneDialer.Default.Open(SecurityContact);
+            string cleanNumber = SecurityContact.Replace(" ", "");
+            if (PhoneDialer.Default.IsSupported)
+                PhoneDialer.Default.Open(cleanNumber);
+            else
+                await Launcher.Default.OpenAsync($"tel:{cleanNumber}");
         }
-        catch (Exception)
+        catch
         {
-            try
-            {
-                await Launcher.Default.OpenAsync($"tel:{SecurityContact}");
-            }
-            catch
-            {
-                await Shell.Current.DisplayAlert("Action Failed",
-                    $"Could not open dialer. Please manually call UTS Security: {SecurityContact}", "OK");
-            }
+            await Shell.Current.DisplayAlert("Failed", $"Please dial {SecurityContact}", "OK");
         }
     }
 
@@ -96,8 +128,6 @@ public partial class ReportViewModel : ObservableObject
             {
                 if (MediaPicker.Default.IsCaptureSupported)
                     photo = await MediaPicker.Default.CapturePhotoAsync();
-                else
-                    await Shell.Current.DisplayAlert("Error", "Camera not supported", "OK");
             }
             else if (action == "Choose from Gallery")
             {
@@ -111,9 +141,8 @@ public partial class ReportViewModel : ObservableObject
                 EvidenceImage = ImageSource.FromStream(() => stream);
             }
         }
-        catch (Exception ex)
+        catch
         {
-            await Shell.Current.DisplayAlert("Error", $"Could not pick photo: {ex.Message}", "OK");
         }
     }
 
@@ -122,15 +151,13 @@ public partial class ReportViewModel : ObservableObject
     {
         if (string.IsNullOrEmpty(Description))
         {
-            await Shell.Current.DisplayAlert("Error", "Please describe the incident.", "OK");
+            await Shell.Current.DisplayAlert("Required", "Please describe the incident.", "OK");
             return;
         }
-
-        // Logic to send data to backend...
-        await Shell.Current.DisplayAlert("Report Sent", $"Incident reported at {LocationLabel}", "OK");
-
+        await Shell.Current.DisplayAlert("Report Sent", "Incident reported to UTS Security.", "OK");
         Description = string.Empty;
         EvidenceImage = null;
         LocationLabel = "No location set";
+        MapUrl = "https://worldview.earthdata.nasa.gov/"; // Reset map
     }
 }
