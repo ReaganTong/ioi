@@ -26,7 +26,7 @@ public partial class ReportViewModel : ObservableObject
     [ObservableProperty]
     private string locationLabel = "No location set";
 
-    // NEW: Property to control the NASA Map URL
+    // NASA Worldview URL
     [ObservableProperty]
     private string mapUrl = "https://worldview.earthdata.nasa.gov/";
 
@@ -52,6 +52,7 @@ public partial class ReportViewModel : ObservableObject
                 }
             }
 
+            // 'Best' accuracy tries to use GPS/Network to get a fix
             var request = new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(20));
             var location = await Geolocation.Default.GetLocationAsync(request);
 
@@ -61,9 +62,8 @@ public partial class ReportViewModel : ObservableObject
                 Longitude = location.Longitude;
                 LocationLabel = $"📍 {Latitude:F4}, {Longitude:F4}";
 
-                // FIX: Update NASA Map to zoom into the user's location
-                // NASA Worldview uses 'v' parameter for bounding box: minLon,minLat,maxLon,maxLat
-                double offset = 0.05; // Roughly 5km zoom level
+                // Update NASA Map to zoom into the user's location using a bounding box
+                double offset = 0.05; // Roughly 5km area
                 string bbox = $"{Longitude - offset},{Latitude - offset},{Longitude + offset},{Latitude + offset}";
                 MapUrl = $"https://worldview.earthdata.nasa.gov/?v={bbox}";
             }
@@ -84,10 +84,12 @@ public partial class ReportViewModel : ObservableObject
             if (openSettings)
             {
 #if ANDROID
+                // Opens the specific GPS toggle screen on Android
                 var intent = new Intent(Settings.ActionLocationSourceSettings);
                 intent.AddFlags(ActivityFlags.NewTask);
                 Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.StartActivity(intent);
 #else
+                // iOS fallback
                 AppInfo.Current.ShowSettingsUI();
 #endif
             }
@@ -141,9 +143,7 @@ public partial class ReportViewModel : ObservableObject
                 EvidenceImage = ImageSource.FromStream(() => stream);
             }
         }
-        catch
-        {
-        }
+        catch { }
     }
 
     [RelayCommand]
@@ -158,6 +158,6 @@ public partial class ReportViewModel : ObservableObject
         Description = string.Empty;
         EvidenceImage = null;
         LocationLabel = "No location set";
-        MapUrl = "https://worldview.earthdata.nasa.gov/"; // Reset map
+        MapUrl = "https://worldview.earthdata.nasa.gov/";
     }
 }

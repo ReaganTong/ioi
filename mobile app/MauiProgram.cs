@@ -21,22 +21,21 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        // FIX: Advanced WebView Settings for Android
-        // 1. Enable DOM Storage (Critical for maps)
-        // 2. Enable Mixed Content (Critical for loading all map tiles)
+        // FIX: Configure Android WebView to allow NASA Worldview to load
 #if ANDROID
         Microsoft.Maui.Handlers.WebViewHandler.Mapper.AppendToMapping("EnhancedWebView", (handler, view) =>
         {
             if (handler.PlatformView != null)
             {
+                // Enable JavaScript and DOM Storage (Critical for modern maps)
                 handler.PlatformView.Settings.JavaScriptEnabled = true;
                 handler.PlatformView.Settings.DomStorageEnabled = true;
                 handler.PlatformView.Settings.AllowFileAccess = true;
                 
-                // FIXED: The correct enum is 'MixedContentHandling', not 'MixedContentMode'
+                // Allow "Mixed Content" (HTTP resources on an HTTPS site) to prevent blank maps
                 handler.PlatformView.Settings.MixedContentMode = Android.Webkit.MixedContentHandling.AlwaysAllow;
                 
-                // Ensures 3D content (WebGL) renders correctly
+                // Allow WebGL to render properly
                 handler.PlatformView.Settings.MediaPlaybackRequiresUserGesture = false;
             }
         });
