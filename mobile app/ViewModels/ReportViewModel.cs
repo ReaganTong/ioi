@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.Devices.Sensors;
 using Microsoft.Maui.Media;
-using System.Collections.ObjectModel;
 using Microsoft.Maui.ApplicationModel;
 using System.Threading.Tasks;
 
@@ -26,13 +25,14 @@ public partial class ReportViewModel : ObservableObject
     [ObservableProperty]
     private string locationLabel = "No location set";
 
-    // NASA Worldview URL
+    // FIX 1: Make these Observable so the UI detects changes!
     [ObservableProperty]
-    private string mapUrl = "https://worldview.earthdata.nasa.gov/";
+    private double latitude;
+
+    [ObservableProperty]
+    private double longitude;
 
     private FileResult? _photoFile;
-    public double Latitude { get; set; }
-    public double Longitude { get; set; }
 
     [RelayCommand]
     private async Task GetCurrentLocation()
@@ -52,20 +52,15 @@ public partial class ReportViewModel : ObservableObject
                 }
             }
 
-            // 'Best' accuracy tries to use GPS/Network to get a fix
             var request = new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(20));
             var location = await Geolocation.Default.GetLocationAsync(request);
 
             if (location != null)
             {
+                // FIX 2: Setting these now triggers the map to update automatically
                 Latitude = location.Latitude;
                 Longitude = location.Longitude;
                 LocationLabel = $"📍 {Latitude:F4}, {Longitude:F4}";
-
-                // Update NASA Map to zoom into the user's location using a bounding box
-                double offset = 0.05; // Roughly 5km area
-                string bbox = $"{Longitude - offset},{Latitude - offset},{Longitude + offset},{Latitude + offset}";
-                MapUrl = $"https://worldview.earthdata.nasa.gov/?v={bbox}";
             }
             else
             {
@@ -75,21 +70,14 @@ public partial class ReportViewModel : ObservableObject
         catch (FeatureNotEnabledException)
         {
             LocationLabel = "Location is off";
-
-            bool openSettings = await Shell.Current.DisplayAlert(
-                "Location Disabled",
-                "Your phone's location is turned off. Please enable it in Settings.",
-                "Open Settings", "Cancel");
-
+            bool openSettings = await Shell.Current.DisplayAlert("Location Disabled", "Please turn on location services.", "Open Settings", "Cancel");
             if (openSettings)
             {
 #if ANDROID
-                // Opens the specific GPS toggle screen on Android
                 var intent = new Intent(Settings.ActionLocationSourceSettings);
                 intent.AddFlags(ActivityFlags.NewTask);
                 Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.StartActivity(intent);
 #else
-                // iOS fallback
                 AppInfo.Current.ShowSettingsUI();
 #endif
             }
@@ -106,15 +94,10 @@ public partial class ReportViewModel : ObservableObject
         try
         {
             string cleanNumber = SecurityContact.Replace(" ", "");
-            if (PhoneDialer.Default.IsSupported)
-                PhoneDialer.Default.Open(cleanNumber);
-            else
-                await Launcher.Default.OpenAsync($"tel:{cleanNumber}");
+            if (PhoneDialer.Default.IsSupported) PhoneDialer.Default.Open(cleanNumber);
+            else await Launcher.Default.OpenAsync($"tel:{cleanNumber}");
         }
-        catch
-        {
-            await Shell.Current.DisplayAlert("Failed", $"Please dial {SecurityContact}", "OK");
-        }
+        catch { await Shell.Current.DisplayAlert("Failed", $"Dial {SecurityContact}", "OK"); }
     }
 
     [RelayCommand]
@@ -126,15 +109,10 @@ public partial class ReportViewModel : ObservableObject
             if (action == "Cancel") return;
 
             FileResult? photo = null;
-            if (action == "Take Photo")
-            {
-                if (MediaPicker.Default.IsCaptureSupported)
-                    photo = await MediaPicker.Default.CapturePhotoAsync();
-            }
+            if (action == "Take Photo" && MediaPicker.Default.IsCaptureSupported)
+                photo = await MediaPicker.Default.CapturePhotoAsync();
             else if (action == "Choose from Gallery")
-            {
                 photo = await MediaPicker.Default.PickPhotoAsync();
-            }
 
             if (photo != null)
             {
@@ -154,10 +132,9 @@ public partial class ReportViewModel : ObservableObject
             await Shell.Current.DisplayAlert("Required", "Please describe the incident.", "OK");
             return;
         }
-        await Shell.Current.DisplayAlert("Report Sent", "Incident reported to UTS Security.", "OK");
+        await Shell.Current.DisplayAlert("Report Sent", "Incident reported.", "OK");
         Description = string.Empty;
         EvidenceImage = null;
         LocationLabel = "No location set";
-        MapUrl = "https://worldview.earthdata.nasa.gov/";
     }
 }

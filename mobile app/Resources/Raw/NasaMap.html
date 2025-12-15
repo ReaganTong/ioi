@@ -3,39 +3,49 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>NASA GIBS Map</title>
-    
+    <title>Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <style>
-        body { margin: 0; padding: 0; }
+        body { margin: 0; padding: 0; background: #000; }
         #map { position: absolute; top: 0; bottom: 0; width: 100%; }
     </style>
 </head>
 <body>
     <div id="map"></div>
-
     <script>
-        // 1. Initialize the Map
-        var map = L.map('map').setView([2.3139, 111.8305], 6); // Centered on Sarawak (Matches your location context)
+        // Initialize Map
+        var map = L.map('map', { zoomControl: false }).setView([2.3139, 111.8305], 13);
 
-        // 2. Define NASA GIBS Tile Layer (Blue Marble / VIIRS)
-        // See GIBS documentation for more layers: https://wiki.earthdata.nasa.gov/display/GIBS/GIBS+API+for+Developers
-        var nasaLayer = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/2024-03-01/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg', {
-            attribution: 'Imagery © NASA GIBS',
-            maxZoom: 9,
-            tileSize: 256
+        // Esri Satellite Layer (Better for Zooming)
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Labels Layer
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19
+        }).addTo(map);
+
+        var currentMarker = null;
+
+        // FUNCTION CALLED BY C# APP to Zoom & Pin
+        function setLocation(lat, lon) {
+            map.setView([lat, lon], 18); // Zoom very close (Level 18)
+            addPin(lat, lon);
+        }
+
+        function addPin(lat, lon) {
+            if (currentMarker) map.removeLayer(currentMarker);
+            currentMarker = L.marker([lat, lon]).addTo(map);
+        }
+
+        // Tap Event
+        map.on('click', function(e) {
+            addPin(e.latlng.lat, e.latlng.lng);
+            window.location.href = "app://pin?lat=" + e.latlng.lat + "&lon=" + e.latlng.lng;
         });
-
-        // 3. Add Reference Labels (Optional, using OpenStreetMap labels for context)
-        var labelLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            opacity: 0.5,
-            attribution: '© OpenStreetMap'
-        });
-
-        nasaLayer.addTo(map);
-        labelLayer.addTo(map);
     </script>
 </body>
 </html>
