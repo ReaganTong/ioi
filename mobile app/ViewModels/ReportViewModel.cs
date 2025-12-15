@@ -16,6 +16,9 @@ public partial class ReportViewModel : ObservableObject
 {
     private const string SecurityContact = "082-260991";
 
+    // NEW: Define an event to force the map to move
+    public event Action<double, double>? RequestSetLocation;
+
     [ObservableProperty]
     private string description = string.Empty;
 
@@ -25,7 +28,6 @@ public partial class ReportViewModel : ObservableObject
     [ObservableProperty]
     private string locationLabel = "No location set";
 
-    // FIX 1: Make these Observable so the UI detects changes!
     [ObservableProperty]
     private double latitude;
 
@@ -52,17 +54,22 @@ public partial class ReportViewModel : ObservableObject
                 }
             }
 
-            var request = new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(20));
-            var location = await Geolocation.Default.GetLocationAsync(request);
-
+            // 1. Try Last Known Location (Fast)
+            var location = await Geolocation.Default.GetLastKnownLocationAsync();
             if (location != null)
             {
-                // FIX 2: Setting these now triggers the map to update automatically
-                Latitude = location.Latitude;
-                Longitude = location.Longitude;
-                LocationLabel = $"📍 {Latitude:F4}, {Longitude:F4}";
+                UpdateLocation(location);
             }
-            else
+
+            // 2. Get Fresh Location (Accurate)
+            var request = new GeolocationRequest(GeolocationAccuracy.Default, TimeSpan.FromSeconds(10));
+            var freshLocation = await Geolocation.Default.GetLocationAsync(request);
+
+            if (freshLocation != null)
+            {
+                UpdateLocation(freshLocation);
+            }
+            else if (location == null)
             {
                 LocationLabel = "Could not find location";
             }
@@ -86,6 +93,17 @@ public partial class ReportViewModel : ObservableObject
         {
             LocationLabel = $"Error: {ex.Message}";
         }
+    }
+
+    // Helper to update data AND fire the map event
+    private void UpdateLocation(Location loc)
+    {
+        Latitude = loc.Latitude;
+        Longitude = loc.Longitude;
+        LocationLabel = $"📍 {Latitude:F4}, {Longitude:F4}";
+
+        // FIX: Directly tell the View to move the map
+        RequestSetLocation?.Invoke(Latitude, Longitude);
     }
 
     [RelayCommand]

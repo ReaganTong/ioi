@@ -4,6 +4,10 @@ using mobile_app.ViewModels;
 using mobile_app.Views;
 using Plugin.LocalNotification;
 
+#if ANDROID
+using Android.Views; // Required for touch events
+#endif
+
 namespace mobile_app;
 
 public static class MauiProgram
@@ -21,22 +25,38 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        // FIX: Configure Android WebView to allow NASA Worldview to load
+        // FIX: Advanced WebView Settings + Touch Handling
 #if ANDROID
         Microsoft.Maui.Handlers.WebViewHandler.Mapper.AppendToMapping("EnhancedWebView", (handler, view) =>
         {
             if (handler.PlatformView != null)
             {
-                // Enable JavaScript and DOM Storage (Critical for modern maps)
+                // 1. Enable Settings for Map
                 handler.PlatformView.Settings.JavaScriptEnabled = true;
                 handler.PlatformView.Settings.DomStorageEnabled = true;
                 handler.PlatformView.Settings.AllowFileAccess = true;
-                
-                // Allow "Mixed Content" (HTTP resources on an HTTPS site) to prevent blank maps
                 handler.PlatformView.Settings.MixedContentMode = Android.Webkit.MixedContentHandling.AlwaysAllow;
-                
-                // Allow WebGL to render properly
                 handler.PlatformView.Settings.MediaPlaybackRequiresUserGesture = false;
+
+                // 2. FIX: Stop the Page from Scrolling when touching the Map
+                handler.PlatformView.Touch += (sender, e) =>
+                {
+                    // If the user puts their finger DOWN on the map...
+                    if (e.Event.Action == MotionEventActions.Down)
+                    {
+                        // Tell the parent (ScrollView) to STOP intercepting touches
+                        handler.PlatformView.Parent?.RequestDisallowInterceptTouchEvent(true);
+                    }
+                    // If the user LIFTS their finger or cancels...
+                    else if (e.Event.Action == MotionEventActions.Up || e.Event.Action == MotionEventActions.Cancel)
+                    {
+                        // Allow the page to scroll again
+                        handler.PlatformView.Parent?.RequestDisallowInterceptTouchEvent(false);
+                    }
+
+                    // IMPORTANT: Return 'false' so the Map still gets the touch event (to pan/zoom)
+                    e.Handled = false;
+                };
             }
         });
 #endif

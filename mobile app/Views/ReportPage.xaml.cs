@@ -1,5 +1,5 @@
 ﻿using mobile_app.ViewModels;
-using System.Web; // Needed for parsing URL query
+using System.Web;
 
 namespace mobile_app.Views;
 
@@ -13,13 +13,21 @@ public partial class ReportPage : ContentPage
         _viewModel = viewModel;
         BindingContext = viewModel;
 
-        // 1. Load the Map
         LoadLocalMap();
 
-        // 2. Listen for "Get My Location" updates
+        // FIX: Subscribe to the "Force Move" event from the ViewModel
+        // This ensures the map ALWAYS zooms when you click "Get Location", 
+        // even if the location hasn't changed much.
         if (_viewModel != null)
         {
-            _viewModel.PropertyChanged += OnViewModelPropertyChanged;
+            _viewModel.RequestSetLocation += (lat, lon) =>
+            {
+                // We run this on the main thread to be safe
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await NasaWebView.EvaluateJavaScriptAsync($"setLocation({lat}, {lon})");
+                });
+            };
         }
     }
 
@@ -38,20 +46,7 @@ public partial class ReportPage : ContentPage
         }
     }
 
-    // Runs when ViewModel Latitude changes (bridge from C# to JS)
-    private async void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(ReportViewModel.Latitude))
-        {
-            if (_viewModel.Latitude != 0 && _viewModel.Longitude != 0)
-            {
-                // Send coordinates to the Map
-                await NasaWebView.EvaluateJavaScriptAsync($"setLocation({_viewModel.Latitude}, {_viewModel.Longitude})");
-            }
-        }
-    }
-
-    // Runs when Map is Tapped (bridge from JS to C#)
+    // 2. JavaScript -> C# (When you Tap the Map)
     private void OnMapNavigating(object sender, WebNavigatingEventArgs e)
     {
         if (e.Url.StartsWith("app://pin"))
@@ -67,6 +62,8 @@ public partial class ReportPage : ContentPage
                 {
                     if (_viewModel != null)
                     {
+                        // Simply update the numbers for the report
+                        // We DO NOT force the map to move here, preventing the "choppy" loop
                         _viewModel.Latitude = lat;
                         _viewModel.Longitude = lon;
                         _viewModel.LocationLabel = $"Pinned: {lat:F4}, {lon:F4}";
