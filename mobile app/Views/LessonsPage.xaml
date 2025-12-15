@@ -7,54 +7,81 @@
              Title="Educational Hub">
 
     <ScrollView>
-        <VerticalStackLayout>
+        <VerticalStackLayout Spacing="0" Padding="0,0,0,20">
+
             <Label Text="Types of Bullying" 
-                   FontSize="28" 
+                   FontSize="24" 
                    FontAttributes="Bold" 
-                   Margin="20, 20, 20, 0" 
+                   Margin="20, 20, 20, 5" 
                    TextColor="{StaticResource TextColor}" />
 
             <Label Text="Educate yourself and recognize bullying behaviours."
                    FontSize="14"
-                   Margin="20, 5, 20, 15" 
+                   Margin="20, 0, 20, 15" 
                    TextColor="{StaticResource Gray600}" />
-            <CollectionView ItemsSource="{Binding Lessons}"
-                Margin="10, 0">
 
-                <CollectionView.ItemTemplate>
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding Lessons}" Spacing="10" Margin="10,0">
+                <BindableLayout.ItemTemplate>
                     <DataTemplate>
                         <Frame Style="{StaticResource CardFrameStyle}" 
-                   Margin="10, 5"
-                   BackgroundColor="{Binding Color}"
-                   Padding="0">
+                               BackgroundColor="{Binding Color}"
+                               Padding="0"
+                               HeightRequest="100">
 
                             <Frame.GestureRecognizers>
                                 <TapGestureRecognizer 
-                        Command="{Binding BindingContext.GoToDetailsCommand, Source={x:Reference lessonsPage}}"
-                        CommandParameter="{Binding .}"
-                        NumberOfTapsRequired="1" />
+                                    Command="{Binding BindingContext.GoToDetailsCommand, Source={x:Reference lessonsPage}}"
+                                    CommandParameter="{Binding .}" />
                             </Frame.GestureRecognizers>
 
                             <Grid ColumnDefinitions="70, *" Padding="15">
-                                <Label Text="{Binding Icon}" 
-                           FontSize="40" 
-                           VerticalOptions="Center" 
-                           HorizontalOptions="Center" />
-
-                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="5">
-                                    <Label Text="{Binding Title}" 
-                               FontAttributes="Bold" 
-                               FontSize="18" 
-                               TextColor="White" />
-                                    <Label Text="{Binding ShortDescription}" 
-                               FontSize="13" 
-                               TextColor="#F0F0F0" />
+                                <Label Text="{Binding Icon}" FontSize="40" VerticalOptions="Center" HorizontalOptions="Center" />
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                    <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="18" TextColor="White" />
+                                    <Label Text="{Binding ShortDescription}" FontSize="13" TextColor="#F0F0F0" />
                                 </VerticalStackLayout>
                             </Grid>
                         </Frame>
                     </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+
+            <Label Text="Practice Quizzes" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   Margin="20, 30, 20, 5" 
+                   TextColor="{StaticResource TextColor}" />
+
+            <Label Text="Test your knowledge and earn badges."
+                   FontSize="14"
+                   Margin="20, 0, 20, 15" 
+                   TextColor="{StaticResource Gray600}" />
+
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding Quizzes}" Spacing="10" Margin="10,0">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Style="{StaticResource CardFrameStyle}" 
+                               BackgroundColor="{Binding Color}"
+                               Padding="0"
+                               HeightRequest="100">
+
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer 
+                                    Command="{Binding BindingContext.PlayQuizCommand, Source={x:Reference lessonsPage}}"
+                                    CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
+
+                            <Grid ColumnDefinitions="70, *" Padding="15">
+                                <Label Text="❓" FontSize="30" VerticalOptions="Center" HorizontalOptions="Center" />
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                    <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="18" TextColor="White" />
+                                    <Label Text="{Binding Description}" FontSize="13" TextColor="#F0F0F0" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
 
         </VerticalStackLayout>
     </ScrollView>
