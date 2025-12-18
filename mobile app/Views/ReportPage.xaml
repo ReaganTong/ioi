@@ -5,10 +5,6 @@
              x:Class="mobile_app.Views.ReportPage"
              Title="Report Incident">
 
-    <ContentPage.BindingContext>
-        <vm:ReportViewModel />
-    </ContentPage.BindingContext>
-
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
 

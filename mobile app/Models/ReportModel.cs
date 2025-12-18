@@ -1,15 +1,23 @@
-﻿using SQLite;
+﻿using Supabase.Postgrest.Attributes; // FIX: Added 'Supabase.' prefix
+using Supabase.Postgrest.Models;     // FIX: Added 'Supabase.' prefix
 
 namespace mobile_app.Models;
 
-public class ReportModel
+[Table("reports")]
+public class ReportModel : BaseModel
 {
-    [PrimaryKey, AutoIncrement]
+    [PrimaryKey("id", false)]
     public int Id { get; set; }
 
+    [Column("description")]
     public string Description { get; set; }
-    public double Latitude { get; set; }
-    public double Longitude { get; set; }
-    public string EvidencePath { get; set; } // Store file path, not the image itself
-    public DateTime DateReported { get; set; }
+
+    [Column("location")]
+    public string Location { get; set; }
+
+    [Column("student_id")]
+    public string StudentId { get; set; }
+
+    [Column("created_at")]
+    public DateTime CreatedAt { get; set; }
 }

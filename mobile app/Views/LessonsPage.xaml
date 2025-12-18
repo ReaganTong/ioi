@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:mobile_app.ViewModels"
+             xmlns:views="clr-namespace:mobile_app.Views"
              x:Class="mobile_app.Views.LessonsPage"
              x:Name="lessonsPage"
              Title="Educational Hub">
@@ -26,17 +27,21 @@
                         <Frame Style="{StaticResource CardFrameStyle}" 
                                BackgroundColor="{Binding Color}"
                                Padding="0"
-                               HeightRequest="100">
+                               HeightRequest="100"
+                               IsClippedToBounds="True">
 
-                            <Frame.GestureRecognizers>
-                                <TapGestureRecognizer 
-                                    Command="{Binding BindingContext.GoToDetailsCommand, Source={x:Reference lessonsPage}}"
-                                    CommandParameter="{Binding .}" />
-                            </Frame.GestureRecognizers>
+                            <Grid ColumnDefinitions="70, *" Padding="15" BackgroundColor="Transparent">
 
-                            <Grid ColumnDefinitions="70, *" Padding="15">
-                                <Label Text="{Binding Icon}" FontSize="40" VerticalOptions="Center" HorizontalOptions="Center" />
-                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LessonViewModel}}, Path=GoToDetailsCommand}"
+                                        CommandParameter="{Binding .}"
+                                        NumberOfTapsRequired="1" />
+                                </Grid.GestureRecognizers>
+
+                                <Label Text="{Binding Icon}" FontSize="40" VerticalOptions="Center" HorizontalOptions="Center" InputTransparent="True" />
+
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2" InputTransparent="True">
                                     <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="18" TextColor="White" />
                                     <Label Text="{Binding ShortDescription}" FontSize="13" TextColor="#F0F0F0" />
                                 </VerticalStackLayout>
@@ -63,17 +68,21 @@
                         <Frame Style="{StaticResource CardFrameStyle}" 
                                BackgroundColor="{Binding Color}"
                                Padding="0"
-                               HeightRequest="100">
+                               HeightRequest="100"
+                               IsClippedToBounds="True">
 
-                            <Frame.GestureRecognizers>
-                                <TapGestureRecognizer 
-                                    Command="{Binding BindingContext.PlayQuizCommand, Source={x:Reference lessonsPage}}"
-                                    CommandParameter="{Binding .}" />
-                            </Frame.GestureRecognizers>
+                            <Grid ColumnDefinitions="70, *" Padding="15" BackgroundColor="Transparent">
 
-                            <Grid ColumnDefinitions="70, *" Padding="15">
-                                <Label Text="❓" FontSize="30" VerticalOptions="Center" HorizontalOptions="Center" />
-                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LessonViewModel}}, Path=PlayQuizCommand}"
+                                        CommandParameter="{Binding .}"
+                                        NumberOfTapsRequired="1" />
+                                </Grid.GestureRecognizers>
+
+                                <Label Text="❓" FontSize="30" VerticalOptions="Center" HorizontalOptions="Center" InputTransparent="True" />
+
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2" InputTransparent="True">
                                     <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="18" TextColor="White" />
                                     <Label Text="{Binding Description}" FontSize="13" TextColor="#F0F0F0" />
                                 </VerticalStackLayout>

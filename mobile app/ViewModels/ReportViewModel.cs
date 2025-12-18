@@ -1,23 +1,24 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using mobile_app.Models;
+using Supabase;
 using Microsoft.Maui.Devices.Sensors;
-using Microsoft.Maui.Media;
 using Microsoft.Maui.ApplicationModel;
-using System.Threading.Tasks;
-
-#if ANDROID
-using Android.Content;
-using Android.Provider;
-#endif
+using Microsoft.Maui.Media;
 
 namespace mobile_app.ViewModels;
 
 public partial class ReportViewModel : ObservableObject
 {
-    private const string SecurityContact = "082-260991";
+    private readonly Client _supabase;
 
-    // NEW: Define an event to force the map to move
+    // FIX 1: Restore the event so the Map can listen to it
     public event Action<double, double>? RequestSetLocation;
+
+    public ReportViewModel(Client supabase)
+    {
+        _supabase = supabase;
+    }
 
     [ObservableProperty]
     private string description = string.Empty;
@@ -28,6 +29,7 @@ public partial class ReportViewModel : ObservableObject
     [ObservableProperty]
     private string locationLabel = "No location set";
 
+    // FIX 2: Use ONLY ObservableProperty. Do NOT add public double Latitude { get; set; } manually.
     [ObservableProperty]
     private double latitude;
 
@@ -35,6 +37,8 @@ public partial class ReportViewModel : ObservableObject
     private double longitude;
 
     private FileResult? _photoFile;
+
+    // --- LOCATION LOGIC ---
 
     [RelayCommand]
     private async Task GetCurrentLocation()
@@ -74,73 +78,23 @@ public partial class ReportViewModel : ObservableObject
                 LocationLabel = "Could not find location";
             }
         }
-        catch (FeatureNotEnabledException)
-        {
-            LocationLabel = "Location is off";
-            bool openSettings = await Shell.Current.DisplayAlert("Location Disabled", "Please turn on location services.", "Open Settings", "Cancel");
-            if (openSettings)
-            {
-#if ANDROID
-                var intent = new Intent(Settings.ActionLocationSourceSettings);
-                intent.AddFlags(ActivityFlags.NewTask);
-                Microsoft.Maui.ApplicationModel.Platform.CurrentActivity.StartActivity(intent);
-#else
-                AppInfo.Current.ShowSettingsUI();
-#endif
-            }
-        }
         catch (Exception ex)
         {
             LocationLabel = $"Error: {ex.Message}";
         }
     }
 
-    // Helper to update data AND fire the map event
     private void UpdateLocation(Location loc)
     {
         Latitude = loc.Latitude;
         Longitude = loc.Longitude;
         LocationLabel = $"📍 {Latitude:F4}, {Longitude:F4}";
 
-        // FIX: Directly tell the View to move the map
+        // Fire event to move the map
         RequestSetLocation?.Invoke(Latitude, Longitude);
     }
 
-    [RelayCommand]
-    private async Task CallSecurity()
-    {
-        try
-        {
-            string cleanNumber = SecurityContact.Replace(" ", "");
-            if (PhoneDialer.Default.IsSupported) PhoneDialer.Default.Open(cleanNumber);
-            else await Launcher.Default.OpenAsync($"tel:{cleanNumber}");
-        }
-        catch { await Shell.Current.DisplayAlert("Failed", $"Dial {SecurityContact}", "OK"); }
-    }
-
-    [RelayCommand]
-    private async Task PickPhoto()
-    {
-        try
-        {
-            string action = await Shell.Current.DisplayActionSheet("Add Evidence", "Cancel", null, "Take Photo", "Choose from Gallery");
-            if (action == "Cancel") return;
-
-            FileResult? photo = null;
-            if (action == "Take Photo" && MediaPicker.Default.IsCaptureSupported)
-                photo = await MediaPicker.Default.CapturePhotoAsync();
-            else if (action == "Choose from Gallery")
-                photo = await MediaPicker.Default.PickPhotoAsync();
-
-            if (photo != null)
-            {
-                _photoFile = photo;
-                var stream = await photo.OpenReadAsync();
-                EvidenceImage = ImageSource.FromStream(() => stream);
-            }
-        }
-        catch { }
-    }
+    // --- SUBMISSION LOGIC ---
 
     [RelayCommand]
     private async Task SubmitReport()
@@ -150,9 +104,59 @@ public partial class ReportViewModel : ObservableObject
             await Shell.Current.DisplayAlert("Required", "Please describe the incident.", "OK");
             return;
         }
-        await Shell.Current.DisplayAlert("Report Sent", "Incident reported.", "OK");
-        Description = string.Empty;
-        EvidenceImage = null;
-        LocationLabel = "No location set";
+
+        try
+        {
+            var newReport = new ReportModel
+            {
+                Description = this.Description,
+                Location = $"{Latitude},{Longitude}",
+                StudentId = "12345678" // Hardcoded for now, or get from Profile
+            };
+
+            // Insert into Supabase
+            await _supabase.From<ReportModel>().Insert(newReport);
+
+            await Shell.Current.DisplayAlert("Success", "Report sent to Supabase!", "OK");
+
+            // Reset Form
+            Description = string.Empty;
+            EvidenceImage = null;
+            LocationLabel = "No location set";
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Error", $"Failed to send: {ex.Message}", "OK");
+        }
+    }
+
+    [RelayCommand]
+    private async Task PickPhoto()
+    {
+        try
+        {
+            if (MediaPicker.Default.IsCaptureSupported)
+            {
+                var photo = await MediaPicker.Default.CapturePhotoAsync();
+                if (photo != null)
+                {
+                    _photoFile = photo;
+                    var stream = await photo.OpenReadAsync();
+                    EvidenceImage = ImageSource.FromStream(() => stream);
+                }
+            }
+        }
+        catch { }
+    }
+
+    [RelayCommand]
+    private async Task CallSecurity()
+    {
+        try
+        {
+            if (PhoneDialer.Default.IsSupported)
+                PhoneDialer.Default.Open("082-260991");
+        }
+        catch { }
     }
 }
