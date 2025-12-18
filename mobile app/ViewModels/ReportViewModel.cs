@@ -1,97 +1,127 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using mobile_app.Models;
+using mobile_app.Services; // Required for IVideoThumbnailService
 using Supabase;
 using Microsoft.Maui.Devices.Sensors;
 using Microsoft.Maui.ApplicationModel;
-using Microsoft.Maui.Media;
+using System.Collections.ObjectModel;
 
 namespace mobile_app.ViewModels;
 
 public partial class ReportViewModel : ObservableObject
 {
     private readonly Client _supabase;
+    private readonly IVideoThumbnailService _thumbnailService;
 
-    // FIX 1: Restore the event so the Map can listen to it
+    // EVENT: For the Map in the View to listen to
     public event Action<double, double>? RequestSetLocation;
 
-    public ReportViewModel(Client supabase)
+    public ReportViewModel(Client supabase, IVideoThumbnailService thumbnailService)
     {
         _supabase = supabase;
+        _thumbnailService = thumbnailService;
+        Attachments = new ObservableCollection<MediaAttachment>();
     }
 
     [ObservableProperty]
     private string description = string.Empty;
 
-    [ObservableProperty]
-    private ImageSource? evidenceImage;
+    // List to hold multiple photos/videos
+    public ObservableCollection<MediaAttachment> Attachments { get; }
 
     [ObservableProperty]
     private string locationLabel = "No location set";
 
-    // FIX 2: Use ONLY ObservableProperty. Do NOT add public double Latitude { get; set; } manually.
     [ObservableProperty]
     private double latitude;
 
     [ObservableProperty]
     private double longitude;
 
-    private FileResult? _photoFile;
-
-    // --- LOCATION LOGIC ---
+    // --- MEDIA LOGIC (Photos & Videos) ---
 
     [RelayCommand]
-    private async Task GetCurrentLocation()
+    private async Task PickMedia()
     {
         try
         {
-            LocationLabel = "Getting location...";
+            string action = await Shell.Current.DisplayActionSheet("Attach Media", "Cancel", null, "Pick Photo", "Pick Video", "Take Photo", "Take Video");
 
-            var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
-            if (status != PermissionStatus.Granted)
+            FileResult? result = null;
+            bool isVideo = false;
+
+            if (action == "Pick Photo")
+                result = await MediaPicker.Default.PickPhotoAsync();
+            else if (action == "Pick Video")
             {
-                status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
-                if (status != PermissionStatus.Granted)
+                result = await MediaPicker.Default.PickVideoAsync();
+                isVideo = true;
+            }
+            else if (action == "Take Photo" && MediaPicker.Default.IsCaptureSupported)
+                result = await MediaPicker.Default.CapturePhotoAsync();
+            else if (action == "Take Video" && MediaPicker.Default.IsCaptureSupported)
+            {
+                result = await MediaPicker.Default.CaptureVideoAsync();
+                isVideo = true;
+            }
+
+            if (result != null)
+            {
+                ImageSource? previewSource = null;
+
+                if (isVideo)
                 {
-                    LocationLabel = "Permission denied";
-                    return;
+                    // 1. Try to generate a real thumbnail
+                    previewSource = await _thumbnailService.GetThumbnailAsync(result.FullPath);
+
+                    // 2. Fallback
+                    if (previewSource == null) previewSource = ImageSource.FromFile("dotnet_bot.png");
                 }
-            }
+                else
+                {
+                    // It's a photo, just show it
+                    previewSource = ImageSource.FromStream(async (ct) => await result.OpenReadAsync());
+                }
 
-            // 1. Try Last Known Location (Fast)
-            var location = await Geolocation.Default.GetLastKnownLocationAsync();
-            if (location != null)
-            {
-                UpdateLocation(location);
-            }
+                var attachment = new MediaAttachment
+                {
+                    File = result,
+                    IsVideo = isVideo,
+                    PreviewSource = previewSource
+                };
 
-            // 2. Get Fresh Location (Accurate)
-            var request = new GeolocationRequest(GeolocationAccuracy.Default, TimeSpan.FromSeconds(10));
-            var freshLocation = await Geolocation.Default.GetLocationAsync(request);
-
-            if (freshLocation != null)
-            {
-                UpdateLocation(freshLocation);
-            }
-            else if (location == null)
-            {
-                LocationLabel = "Could not find location";
+                Attachments.Add(attachment);
             }
         }
         catch (Exception ex)
         {
-            LocationLabel = $"Error: {ex.Message}";
+            await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
         }
     }
 
-    private void UpdateLocation(Location loc)
+    [RelayCommand]
+    private async Task PreviewAttachment(MediaAttachment attachment)
     {
-        Latitude = loc.Latitude;
-        Longitude = loc.Longitude;
-        LocationLabel = $"📍 {Latitude:F4}, {Longitude:F4}";
+        try
+        {
+            if (attachment == null || attachment.File == null) return;
+            await Launcher.Default.OpenAsync(new OpenFileRequest
+            {
+                Title = "Preview Evidence",
+                File = new ReadOnlyFile(attachment.File.FullPath)
+            });
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Error", "Could not open file: " + ex.Message, "OK");
+        }
+    }
 
-        // Fire event to move the map
-        RequestSetLocation?.Invoke(Latitude, Longitude);
+    [RelayCommand]
+    private void RemoveAttachment(MediaAttachment item)
+    {
+        if (Attachments.Contains(item)) Attachments.Remove(item);
     }
 
     // --- SUBMISSION LOGIC ---
@@ -107,50 +137,39 @@ public partial class ReportViewModel : ObservableObject
 
         try
         {
-            string imageUrl = null;
+            List<string> uploadedUrls = new List<string>();
 
-            // 1. Upload Image (if one was picked)
-            if (_photoFile != null)
+            foreach (var item in Attachments)
             {
-                // Read the file into a byte array
-                using var stream = await _photoFile.OpenReadAsync();
+                using var stream = await item.File.OpenReadAsync();
                 using var memoryStream = new MemoryStream();
                 await stream.CopyToAsync(memoryStream);
                 var fileBytes = memoryStream.ToArray();
 
-                // Create a unique filename (e.g., "evidence/guid.jpg")
-                var fileName = $"{Guid.NewGuid()}.jpg";
+                string ext = item.IsVideo ? ".mp4" : ".jpg";
+                var fileName = $"{Guid.NewGuid()}{ext}";
 
-                // Upload to Supabase Storage (Bucket name: "evidence")
-                await _supabase.Storage
-                    .From("evidence")
-                    .Upload(fileBytes, fileName);
-
-                // Get the Public URL to save in the database
-                imageUrl = _supabase.Storage
-                    .From("evidence")
-                    .GetPublicUrl(fileName);
+                await _supabase.Storage.From("evidence").Upload(fileBytes, fileName);
+                var url = _supabase.Storage.From("evidence").GetPublicUrl(fileName);
+                uploadedUrls.Add(url);
             }
 
-            // 2. Create the Report Object
+            string finalUrlString = string.Join(",", uploadedUrls);
+
             var newReport = new ReportModel
             {
                 Description = this.Description,
                 Location = $"{Latitude},{Longitude}",
                 StudentId = "12345678",
-                ImageUrl = imageUrl, // <--- Now saving the URL!
+                ImageUrl = finalUrlString,
                 CreatedAt = DateTime.UtcNow
             };
 
-            // 3. Insert into Database
             await _supabase.From<ReportModel>().Insert(newReport);
+            await Shell.Current.DisplayAlert("Success", "Report sent!", "OK");
 
-            await Shell.Current.DisplayAlert("Success", "Report sent successfully!", "OK");
-
-            // 4. Reset Form
             Description = string.Empty;
-            EvidenceImage = null;
-            _photoFile = null; // Don't forget to clear the file
+            Attachments.Clear();
             LocationLabel = "No location set";
         }
         catch (Exception ex)
@@ -159,33 +178,42 @@ public partial class ReportViewModel : ObservableObject
         }
     }
 
+    // --- LOCATION & SECURITY ---
+
     [RelayCommand]
-    private async Task PickPhoto()
+    private async Task GetCurrentLocation()
     {
         try
         {
-            if (MediaPicker.Default.IsCaptureSupported)
+            var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+            if (status != PermissionStatus.Granted)
             {
-                var photo = await MediaPicker.Default.CapturePhotoAsync();
-                if (photo != null)
-                {
-                    _photoFile = photo;
-                    var stream = await photo.OpenReadAsync();
-                    EvidenceImage = ImageSource.FromStream(() => stream);
-                }
+                status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                if (status != PermissionStatus.Granted) return;
             }
+
+            var location = await Geolocation.Default.GetLastKnownLocationAsync();
+            if (location != null) UpdateLocation(location);
+
+            var request = new GeolocationRequest(GeolocationAccuracy.Default, TimeSpan.FromSeconds(10));
+            var freshLocation = await Geolocation.Default.GetLocationAsync(request);
+
+            if (freshLocation != null) UpdateLocation(freshLocation);
         }
         catch { }
+    }
+
+    private void UpdateLocation(Location loc)
+    {
+        Latitude = loc.Latitude;
+        Longitude = loc.Longitude;
+        LocationLabel = $"📍 {Latitude:F4}, {Longitude:F4}";
+        RequestSetLocation?.Invoke(Latitude, Longitude);
     }
 
     [RelayCommand]
     private async Task CallSecurity()
     {
-        try
-        {
-            if (PhoneDialer.Default.IsSupported)
-                PhoneDialer.Default.Open("082-260991");
-        }
-        catch { }
+        if (PhoneDialer.Default.IsSupported) PhoneDialer.Default.Open("082-260991");
     }
 }

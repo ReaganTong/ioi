@@ -22,10 +22,16 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
+        // FIX: This MUST be inside #if ANDROID. 
+        // If you put it in #if DEBUG, iOS and Windows try to read it and crash.
+#if ANDROID
+        builder.Services.AddSingleton<mobile_app.Services.IVideoThumbnailService, mobile_app.Platforms.Android.VideoThumbnailService>();
+#endif
+
         // =========================================================
         // 1. REGISTER SUPABASE
         // =========================================================
-        var supabaseUrl = "https://your-project-id.supabase.co";
+        var supabaseUrl = "https://your-project-id.supabase.co"; // Don't forget to put your real keys back!
         var supabaseKey = "your-public-anon-key";
 
         var options = new Supabase.SupabaseOptions
@@ -43,7 +49,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ReportViewModel>();
         builder.Services.AddTransient<HelpViewModel>();
         builder.Services.AddTransient<LessonViewModel>();
-        builder.Services.AddTransient<QuizViewModel>(); // <--- Added this
+        builder.Services.AddTransient<QuizViewModel>();
 
         // =========================================================
         // 3. REGISTER PAGES (VIEWS)
@@ -51,7 +57,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ReportPage>();
         builder.Services.AddTransient<HelpPage>();
         builder.Services.AddTransient<LessonsPage>();
-        builder.Services.AddTransient<QuizPlayPage>();  // <--- Added this
+        builder.Services.AddTransient<QuizPlayPage>();
 
         return builder.Build();
     }

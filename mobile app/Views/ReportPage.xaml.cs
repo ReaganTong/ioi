@@ -15,14 +15,10 @@ public partial class ReportPage : ContentPage
 
         LoadLocalMap();
 
-        // FIX: Subscribe to the "Force Move" event from the ViewModel
-        // This ensures the map ALWAYS zooms when you click "Get Location", 
-        // even if the location hasn't changed much.
         if (_viewModel != null)
         {
             _viewModel.RequestSetLocation += (lat, lon) =>
             {
-                // We run this on the main thread to be safe
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     await NasaWebView.EvaluateJavaScriptAsync($"setLocation({lat}, {lon})");
@@ -30,6 +26,16 @@ public partial class ReportPage : ContentPage
             };
         }
     }
+
+    // --- KEYBOARD CLOSING LOGIC ---
+    private void OnBackgroundClicked(object sender, TappedEventArgs e)
+    {
+        if (DescriptionEditor.IsFocused)
+        {
+            DescriptionEditor.Unfocus();
+        }
+    }
+    // -----------------------------
 
     private async void LoadLocalMap()
     {
@@ -40,13 +46,9 @@ public partial class ReportPage : ContentPage
             var htmlContent = await reader.ReadToEndAsync();
             NasaWebView.Source = new HtmlWebViewSource { Html = htmlContent };
         }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Map Error: {ex.Message}");
-        }
+        catch { }
     }
 
-    // 2. JavaScript -> C# (When you Tap the Map)
     private void OnMapNavigating(object sender, WebNavigatingEventArgs e)
     {
         if (e.Url.StartsWith("app://pin"))
@@ -62,8 +64,6 @@ public partial class ReportPage : ContentPage
                 {
                     if (_viewModel != null)
                     {
-                        // Simply update the numbers for the report
-                        // We DO NOT force the map to move here, preventing the "choppy" loop
                         _viewModel.Latitude = lat;
                         _viewModel.Longitude = lon;
                         _viewModel.LocationLabel = $"Pinned: {lat:F4}, {lon:F4}";

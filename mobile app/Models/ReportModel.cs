@@ -1,5 +1,5 @@
-﻿using Supabase.Postgrest.Attributes; // FIX: Added 'Supabase.' prefix
-using Supabase.Postgrest.Models;     // FIX: Added 'Supabase.' prefix
+﻿using Supabase.Postgrest.Attributes;
+using Supabase.Postgrest.Models;
 
 namespace mobile_app.Models;
 
@@ -21,10 +21,8 @@ public class ReportModel : BaseModel
     [Column("created_at")]
     public DateTime CreatedAt { get; set; }
 
-    [Column("image_url")] // Use the exact column name from your Supabase Table
+    [Column("image_url")]
     public string? ImageUrl { get; set; }
 
-    [Column("created_at")]
-    public DateTime CreatedAt { get; set; }
-
+    // DELETE THE DUPLICATE LINE THAT WAS HERE
 }
