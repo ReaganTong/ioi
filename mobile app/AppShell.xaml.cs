@@ -1,4 +1,5 @@
 ﻿namespace mobile_app;
+using mobile_app.Views;
 
 public partial class AppShell : Shell
 {
@@ -10,5 +11,6 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("LessonDetail", typeof(Views.LessonDetailPage));
         Routing.RegisterRoute("QuizPlay", typeof(Views.QuizPlayPage));
         Routing.RegisterRoute("NewsPage", typeof(Views.NewsPage));
+        Routing.RegisterRoute(nameof(QuizPlayPage), typeof(QuizPlayPage));
     }
 }

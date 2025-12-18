@@ -1,13 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using CommunityToolkit.Mvvm;
-using mobile_app.ViewModels;
 using mobile_app.Views;
-using Plugin.LocalNotification;
-using Supabase; // Add this
-
-#if ANDROID
-using Android.Views;
-#endif
+using mobile_app.ViewModels;
+using Supabase;
 
 namespace mobile_app;
 
@@ -16,35 +10,48 @@ public static class MauiProgram
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
-
         builder
             .UseMauiApp<App>()
-            .UseLocalNotification()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        // FIX: Initialize Supabase
-        var url = "YOUR_SUPABASE_URL";
-        var key = "YOUR_SUPABASE_ANON_KEY";
+#if DEBUG
+        builder.Logging.AddDebug();
+#endif
 
-        var options = new SupabaseOptions
+        // =========================================================
+        // 1. REGISTER SUPABASE
+        // =========================================================
+        var supabaseUrl = "https://your-project-id.supabase.co";
+        var supabaseKey = "your-public-anon-key";
+
+        var options = new Supabase.SupabaseOptions
         {
             AutoRefreshToken = true,
-            AutoConnectRealtime = true
+            AutoConnectRealtime = true,
         };
 
-        var supabase = new Client(url, key, options);
-        builder.Services.AddSingleton(provider => supabase);
+        builder.Services.AddSingleton(provider =>
+            new Supabase.Client(supabaseUrl, supabaseKey, options));
 
-        // ... (Keep your existing Android WebView handler code here) ...
+        // =========================================================
+        // 2. REGISTER VIEWMODELS
+        // =========================================================
+        builder.Services.AddTransient<ReportViewModel>();
+        builder.Services.AddTransient<HelpViewModel>();
+        builder.Services.AddTransient<LessonViewModel>();
+        builder.Services.AddTransient<QuizViewModel>(); // <--- Added this
 
-        // Register ViewModels
-        builder.Services.AddSingleton<ReportViewModel>();
-        builder.Services.AddSingleton<ProfileViewModel>();
-        // ... (Keep other services) ...
+        // =========================================================
+        // 3. REGISTER PAGES (VIEWS)
+        // =========================================================
+        builder.Services.AddTransient<ReportPage>();
+        builder.Services.AddTransient<HelpPage>();
+        builder.Services.AddTransient<LessonsPage>();
+        builder.Services.AddTransient<QuizPlayPage>();  // <--- Added this
 
         return builder.Build();
     }

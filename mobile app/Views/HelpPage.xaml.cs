@@ -1,14 +1,13 @@
 ﻿using mobile_app.ViewModels;
-using Microsoft.Maui.Controls;
 
 namespace mobile_app.Views;
 
 public partial class HelpPage : ContentPage
 {
-    // Inject the ViewModel
-    public HelpPage(HelpViewModel viewModel)
+    // The error often happens if this part is wrong
+    public HelpPage(HelpViewModel vm)
     {
         InitializeComponent();
-        this.BindingContext = viewModel;
+        BindingContext = vm; // Connect the UI to the Logic
     }
 }

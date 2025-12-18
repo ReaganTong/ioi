@@ -107,21 +107,50 @@ public partial class ReportViewModel : ObservableObject
 
         try
         {
+            string imageUrl = null;
+
+            // 1. Upload Image (if one was picked)
+            if (_photoFile != null)
+            {
+                // Read the file into a byte array
+                using var stream = await _photoFile.OpenReadAsync();
+                using var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                var fileBytes = memoryStream.ToArray();
+
+                // Create a unique filename (e.g., "evidence/guid.jpg")
+                var fileName = $"{Guid.NewGuid()}.jpg";
+
+                // Upload to Supabase Storage (Bucket name: "evidence")
+                await _supabase.Storage
+                    .From("evidence")
+                    .Upload(fileBytes, fileName);
+
+                // Get the Public URL to save in the database
+                imageUrl = _supabase.Storage
+                    .From("evidence")
+                    .GetPublicUrl(fileName);
+            }
+
+            // 2. Create the Report Object
             var newReport = new ReportModel
             {
                 Description = this.Description,
                 Location = $"{Latitude},{Longitude}",
-                StudentId = "12345678" // Hardcoded for now, or get from Profile
+                StudentId = "12345678",
+                ImageUrl = imageUrl, // <--- Now saving the URL!
+                CreatedAt = DateTime.UtcNow
             };
 
-            // Insert into Supabase
+            // 3. Insert into Database
             await _supabase.From<ReportModel>().Insert(newReport);
 
-            await Shell.Current.DisplayAlert("Success", "Report sent to Supabase!", "OK");
+            await Shell.Current.DisplayAlert("Success", "Report sent successfully!", "OK");
 
-            // Reset Form
+            // 4. Reset Form
             Description = string.Empty;
             EvidenceImage = null;
+            _photoFile = null; // Don't forget to clear the file
             LocationLabel = "No location set";
         }
         catch (Exception ex)

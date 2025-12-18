@@ -20,4 +20,11 @@ public class ReportModel : BaseModel
 
     [Column("created_at")]
     public DateTime CreatedAt { get; set; }
+
+    [Column("image_url")] // Use the exact column name from your Supabase Table
+    public string? ImageUrl { get; set; }
+
+    [Column("created_at")]
+    public DateTime CreatedAt { get; set; }
+
 }
