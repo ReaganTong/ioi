@@ -18,11 +18,13 @@ public class ReportModel : BaseModel
     [Column("student_id")]
     public string StudentId { get; set; }
 
-    [Column("created_at")]
-    public DateTime CreatedAt { get; set; }
-
     [Column("image_url")]
     public string? ImageUrl { get; set; }
 
-    // DELETE THE DUPLICATE LINE THAT WAS HERE
+    [Column("created_at")]
+    public DateTime CreatedAt { get; set; }
+
+    // NEW: To track if issue is fixed
+    [Column("status")]
+    public string Status { get; set; } = "Pending";
 }

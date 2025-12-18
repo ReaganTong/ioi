@@ -6,11 +6,14 @@
              Title="Report Incident">
 
     <ScrollView>
-        <ScrollView.GestureRecognizers>
-            <TapGestureRecognizer Tapped="OnBackgroundClicked" />
-        </ScrollView.GestureRecognizers>
+        <VerticalStackLayout Padding="20" 
+                             Spacing="15" 
+                             BackgroundColor="Transparent" 
+                             VerticalOptions="Fill">
 
-        <VerticalStackLayout Padding="20" Spacing="15">
+            <VerticalStackLayout.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnBackgroundClicked" />
+            </VerticalStackLayout.GestureRecognizers>
 
             <Button Text="📞 Call UTS Security" 
                     Command="{Binding CallSecurityCommand}" 

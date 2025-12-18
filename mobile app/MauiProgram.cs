@@ -50,6 +50,8 @@ public static class MauiProgram
         builder.Services.AddTransient<HelpViewModel>();
         builder.Services.AddTransient<LessonViewModel>();
         builder.Services.AddTransient<QuizViewModel>();
+        builder.Services.AddTransient<AdminViewModel>();
+       
 
         // =========================================================
         // 3. REGISTER PAGES (VIEWS)
@@ -58,6 +60,7 @@ public static class MauiProgram
         builder.Services.AddTransient<HelpPage>();
         builder.Services.AddTransient<LessonsPage>();
         builder.Services.AddTransient<QuizPlayPage>();
+        builder.Services.AddTransient<AdminPage>();
 
         return builder.Build();
     }
