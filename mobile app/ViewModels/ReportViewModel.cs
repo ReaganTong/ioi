@@ -100,13 +100,9 @@ public partial class ReportViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            // This will pop up a window with the EXACT error details
-            await Shell.Current.DisplayAlert("Diagnostic Error",
-                $"Message: {ex.Message}\n\nInner: {ex.InnerException?.Message}",
-                "OK");
-
-            // Also check your "Output" window in Visual Studio for this line:
-            System.Diagnostics.Debug.WriteLine($"SUPABASE_ERROR: {ex}");
+            // This will tell us if it is a "404 Bucket Not Found" or "403 Forbidden"
+            await Shell.Current.DisplayAlert("Technical Error", ex.Message, "OK");
+            Debug.WriteLine($"FULL ERROR: {ex}");
         }
     }
 
