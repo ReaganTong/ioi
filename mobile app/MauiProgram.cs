@@ -31,8 +31,8 @@ public static class MauiProgram
         // =========================================================
         // 1. REGISTER SUPABASE
         // =========================================================
-        var supabaseUrl = "https://your-project-id.supabase.co"; // Don't forget to put your real keys back!
-        var supabaseKey = "your-public-anon-key";
+        var supabaseUrl = "https://yacthiglkcipbltixron.supabase.co"; // Don't forget to put your real keys back!
+        var supabaseKey = "sb_publishable_thHRqeO7TmSOhuWj9TgB4A_cAw4BwXB";
 
         var options = new Supabase.SupabaseOptions
         {
@@ -41,7 +41,7 @@ public static class MauiProgram
         };
 
         builder.Services.AddSingleton(provider =>
-            new Supabase.Client(supabaseUrl, supabaseKey, options));
+    new Supabase.Client(supabaseUrl, supabaseKey, options));
 
         // =========================================================
         // 2. REGISTER VIEWMODELS
