@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Devices.Sensors;
 using mobile_app.Models;
-using mobile_app.Services; // Required for IVideoThumbnailService
+using mobile_app.Services;
 using Supabase;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -28,7 +28,6 @@ public partial class ReportViewModel : ObservableObject
     [ObservableProperty]
     private string description = string.Empty;
 
-    // List to hold multiple photos/videos
     public ObservableCollection<MediaAttachment> Attachments { get; }
 
     [ObservableProperty]
@@ -43,7 +42,7 @@ public partial class ReportViewModel : ObservableObject
     [ObservableProperty]
     private bool isRefreshing;
 
-    // --- MEDIA LOGIC (Photos & Videos) ---
+    // --- MEDIA LOGIC ---
 
     [RelayCommand]
     private async Task PickMedia()
@@ -76,33 +75,25 @@ public partial class ReportViewModel : ObservableObject
 
                 if (isVideo)
                 {
-                    // 1. Try to generate a real thumbnail
                     previewSource = await _thumbnailService.GetThumbnailAsync(result.FullPath);
-
-                    // 2. Fallback
                     if (previewSource == null) previewSource = ImageSource.FromFile("dotnet_bot.png");
                 }
                 else
                 {
-                    // It's a photo, just show it
                     previewSource = ImageSource.FromStream(async (ct) => await result.OpenReadAsync());
                 }
 
-                var attachment = new MediaAttachment
+                Attachments.Add(new MediaAttachment
                 {
                     File = result,
                     IsVideo = isVideo,
                     PreviewSource = previewSource
-                };
-
-                Attachments.Add(attachment);
+                });
             }
         }
         catch (Exception ex)
         {
-            // This will tell us if it is a "404 Bucket Not Found" or "403 Forbidden"
-            await Shell.Current.DisplayAlert("Technical Error", ex.Message, "OK");
-            Debug.WriteLine($"FULL ERROR: {ex}");
+            await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
         }
     }
 
@@ -111,17 +102,14 @@ public partial class ReportViewModel : ObservableObject
     {
         try
         {
-            if (attachment == null || attachment.File == null) return;
+            if (attachment?.File == null) return;
             await Launcher.Default.OpenAsync(new OpenFileRequest
             {
-                Title = "Preview Evidence",
+                Title = "Preview",
                 File = new ReadOnlyFile(attachment.File.FullPath)
             });
         }
-        catch (Exception ex)
-        {
-            await Shell.Current.DisplayAlert("Error", "Could not open file: " + ex.Message, "OK");
-        }
+        catch { }
     }
 
     [RelayCommand]
@@ -130,7 +118,7 @@ public partial class ReportViewModel : ObservableObject
         if (Attachments.Contains(item)) Attachments.Remove(item);
     }
 
-    // --- SUBMISSION LOGIC ---
+    // --- SUBMISSION LOGIC (FIXED) ---
 
     [RelayCommand]
     private async Task SubmitReport()
@@ -141,21 +129,20 @@ public partial class ReportViewModel : ObservableObject
             return;
         }
 
-        IsRefreshing = true; // Show loading state if you have one
+        IsRefreshing = true;
         try
         {
+            // 1. GET CURRENT USER EMAIL
+            var currentUser = _supabase.Auth.CurrentUser;
+            string studentEmail = currentUser?.Email ?? "Anonymous"; // If not logged in (shouldn't happen), mark Anonymous
+
             List<string> uploadedUrls = new List<string>();
 
+            // 2. Upload Attachments
             foreach (var item in Attachments)
             {
-                // Use the file path directly for better performance
                 var fileName = $"{Guid.NewGuid()}{(item.IsVideo ? ".mp4" : ".jpg")}";
-
-                // Open the file stream
                 using var stream = await item.File.OpenReadAsync();
-
-                // For Supabase C#, it's safer to convert to byte[] only if necessary, 
-                // but let's add a timeout check here.
                 byte[] fileBytes;
                 using (var ms = new MemoryStream())
                 {
@@ -163,33 +150,30 @@ public partial class ReportViewModel : ObservableObject
                     fileBytes = ms.ToArray();
                 }
 
-                // UPLOAD
-                // Ensure the bucket "evidence" exists in Supabase Storage!
                 await _supabase.Storage.From("evidence").Upload(fileBytes, fileName);
-
-                // GET URL
                 var url = _supabase.Storage.From("evidence").GetPublicUrl(fileName);
                 uploadedUrls.Add(url);
             }
 
             string finalUrlString = string.Join(",", uploadedUrls);
 
+            // 3. Create Report Object
             var newReport = new ReportModel
             {
                 Description = this.Description,
                 Location = $"{Latitude},{Longitude}",
-                StudentId = "12345678", // Replace with real Student ID if available
+                StudentId = studentEmail, // <--- FIXED: Now uses real email!
                 ImageUrl = finalUrlString,
                 CreatedAt = DateTime.UtcNow,
-                Status = "Pending" // Make sure your DB column allows this
+                Status = "Pending"
             };
 
-            // SAVE TO TABLE
+            // 4. Save to Database
             await _supabase.From<ReportModel>().Insert(newReport);
 
             await Shell.Current.DisplayAlert("Success", "Report sent successfully!", "OK");
 
-            // RESET UI
+            // Reset UI
             Description = string.Empty;
             Attachments.Clear();
             Latitude = 0;
@@ -198,10 +182,8 @@ public partial class ReportViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            // This will now give you more detail (e.g. if the bucket is missing)
             Debug.WriteLine($"DEBUG: {ex.Message}");
-            await Shell.Current.DisplayAlert("Connection Error",
-                "Make sure you have internet and the 'evidence' storage bucket is created in Supabase.", "OK");
+            await Shell.Current.DisplayAlert("Error", "Could not submit report. Check internet connection.", "OK");
         }
         finally
         {
@@ -209,7 +191,7 @@ public partial class ReportViewModel : ObservableObject
         }
     }
 
-    // --- LOCATION & SECURITY ---
+    // --- LOCATION LOGIC ---
 
     [RelayCommand]
     private async Task GetCurrentLocation()

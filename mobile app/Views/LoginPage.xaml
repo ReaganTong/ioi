@@ -3,36 +3,101 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:mobile_app.ViewModels"
              x:Class="mobile_app.Views.LoginPage"
-             BackgroundColor="White">
+             BackgroundColor="#F3F4F6">
 
-    <ContentPage.BindingContext>
-        <vm:LoginViewModel />
-    </ContentPage.BindingContext>
+    <Grid RowDefinitions="Auto, *">
 
-    <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+        <BoxView Color="{StaticResource PrimaryColor}" 
+                 HeightRequest="250" 
+                 HorizontalOptions="FillAndExpand" 
+                 VerticalOptions="Start" />
 
-        <Image Source="appicon.svg" HeightRequest="150" HorizontalOptions="Center" />
+        <Frame Grid.Row="0" Grid.RowSpan="2" 
+               Margin="30, 80, 30, 0"
+               Padding="30"
+               BackgroundColor="White" 
+               CornerRadius="20" 
+               HasShadow="True"
+               VerticalOptions="Start">
 
-        <Label Text="Welcome Back" 
-               FontSize="28" 
-               FontAttributes="Bold" 
-               HorizontalOptions="Center" 
-               TextColor="#333"/>
+            <VerticalStackLayout Spacing="20">
+                <Image Source="appicon.svg" 
+                       HeightRequest="80" 
+                       WidthRequest="80" 
+                       HorizontalOptions="Center" 
+                       Aspect="AspectFit"/>
 
-        <Entry Placeholder="Username" 
-               Text="{Binding Username}"
-               HeightRequest="50" />
+                <Label Text="Welcome Back" 
+                       FontSize="24" 
+                       FontAttributes="Bold" 
+                       TextColor="#333" 
+                       HorizontalOptions="Center"/>
 
-        <Entry Placeholder="Password" 
-               IsPassword="True"
-               Text="{Binding Password}"
-               HeightRequest="50" />
+                <Label Text="Sign in to continue" 
+                       FontSize="14" 
+                       TextColor="Gray" 
+                       HorizontalOptions="Center" 
+                       Margin="0,-10,0,10"/>
 
-        <Button Text="Login" 
-        Command="{Binding LoginCommand}" 
-        BackgroundColor="{StaticResource PrimaryColor}"  CornerRadius="25" 
-        HeightRequest="50" 
-        FontAttributes="Bold"/>
+                <Border Stroke="#E5E7EB" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="15,5">
+                    <Grid ColumnDefinitions="30, *">
+                        <Label Text="✉️" VerticalOptions="Center"/>
+                        <Entry Grid.Column="1" 
+                               Placeholder="Student Email" 
+                               Text="{Binding Email}" 
+                               TextColor="#333"
+                               Keyboard="Email"/>
+                    </Grid>
+                </Border>
 
-    </VerticalStackLayout>
+                <Border Stroke="#E5E7EB" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="15,5">
+                    <Grid ColumnDefinitions="30, *">
+                        <Label Text="🔒" VerticalOptions="Center"/>
+                        <Entry Grid.Column="1" 
+                               Placeholder="Password" 
+                               Text="{Binding Password}" 
+                               IsPassword="True" 
+                               TextColor="#333"/>
+                    </Grid>
+                </Border>
+
+                <Grid ColumnDefinitions="Auto, *">
+                    <HorizontalStackLayout Grid.Column="0" Spacing="10">
+                        <CheckBox IsChecked="{Binding IsRememberMe}" Color="{StaticResource PrimaryColor}"/>
+                        <Label Text="Remember Me" VerticalOptions="Center" TextColor="Gray" FontSize="13">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ToggleRememberMeCommand}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </HorizontalStackLayout>
+
+                    <Label Grid.Column="1" Text="Forgot Password?" 
+                           TextColor="{StaticResource PrimaryColor}" 
+                           FontSize="13" 
+                           HorizontalOptions="End" 
+                           VerticalOptions="Center"/>
+                </Grid>
+
+                <Button Text="LOGIN" 
+                        Command="{Binding LoginCommand}" 
+                        BackgroundColor="{StaticResource PrimaryColor}" 
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        CornerRadius="25"
+                        HeightRequest="50"
+                        Margin="0,10,0,0"/>
+
+                <Button Text="Register Student Account" 
+                        Command="{Binding SignUpCommand}" 
+                        BackgroundColor="Transparent" 
+                        TextColor="{StaticResource PrimaryColor}"
+                        FontAttributes="Bold"
+                        BorderColor="{StaticResource PrimaryColor}"
+                        BorderWidth="1"
+                        CornerRadius="25"
+                        HeightRequest="50"/>
+
+            </VerticalStackLayout>
+        </Frame>
+    </Grid>
 </ContentPage>

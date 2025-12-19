@@ -1,64 +1,107 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.Media;
+using Supabase;
+using mobile_app.Views;
+using mobile_app.Models;
 
 namespace mobile_app.ViewModels;
 
 public partial class ProfileViewModel : ObservableObject
 {
+    private readonly Client _supabase;
+
+    public ProfileViewModel(Client supabase)
+    {
+        _supabase = supabase;
+        // We don't auto-load here anymore to prevent double-loading.
+        // The View (ProfilePage.xaml.cs) will call RefreshProfile().
+    }
+
     // --- Personal Info ---
-    [ObservableProperty]
-    private string userName = "Student User";
 
     [ObservableProperty]
-    private string bio = "Computer Science Student | Tech Enthusiast"; // New Field
+    private string userName = "Loading...";
 
     [ObservableProperty]
-    private string userEmail = "student@uts.edu.my";
+    private string bio = "Computer Science Student | Tech Enthusiast";
 
     [ObservableProperty]
-    private string phoneNumber = "+60 12-345 6789"; // New Field
+    private string userEmail = "";
 
     [ObservableProperty]
-    private string studentId = "12345678";
+    private string phoneNumber = "+60 12-345 6789";
+
+    [ObservableProperty]
+    private string studentId = "Loading...";
 
     [ObservableProperty]
     private ImageSource profileImage = "dotnet_bot.png";
 
     // --- State Management ---
+
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsNotEditing))] // Notify the opposite property too
+    [NotifyPropertyChangedFor(nameof(IsNotEditing))]
     private bool isEditing;
 
-    public bool IsNotEditing => !IsEditing; // Helper for XAML visibility
+    public bool IsNotEditing => !IsEditing;
 
-    // --- Stats (Read Only) ---
-    [ObservableProperty]
-    private int quizzesCompleted = 5;
+    // --- Stats ---
 
     [ObservableProperty]
-    private int reportsSubmitted = 2;
+    private int reportsSubmitted = 0;
+
+    // --- Logic ---
+
+    // PUBLIC method so the Page can call it
+    public async Task RefreshProfile()
+    {
+        var currentUser = _supabase.Auth.CurrentUser;
+
+        if (currentUser != null)
+        {
+            UserEmail = currentUser.Email;
+
+            // 1. Set Name and ID
+            if (UserEmail.Contains("@"))
+            {
+                StudentId = UserEmail.Split('@')[0];
+                UserName = $"Student {StudentId}";
+            }
+
+            try
+            {
+                // 2. Fetch Report Count (Real DB Call)
+                var reportCount = await _supabase
+                    .From<ReportModel>()
+                    .Where(x => x.StudentId == UserEmail)
+                    .Count(Supabase.Postgrest.Constants.CountType.Exact);
+
+                ReportsSubmitted = reportCount;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading stats: {ex.Message}");
+            }
+        }
+    }
 
     // --- Commands ---
 
     [RelayCommand]
     private void ToggleEditMode()
     {
-        // Toggle the state
         IsEditing = !IsEditing;
-
-        // If we just saved (switched to false), show a toast/alert
         if (!IsEditing)
         {
-            // Here you would save to database in a real app
-            Shell.Current.DisplayAlert("Success", "Profile updated successfully!", "OK");
+            Shell.Current.DisplayAlert("Success", "Profile updated locally!", "OK");
         }
     }
 
     [RelayCommand]
     private async Task ChangePhoto()
     {
-        if (!IsEditing) return; // Only allow changing photo in Edit Mode
+        if (!IsEditing) return;
 
         try
         {
@@ -78,10 +121,11 @@ public partial class ProfileViewModel : ObservableObject
     [RelayCommand]
     private async Task Logout()
     {
-        bool answer = await Shell.Current.DisplayAlert("Logout", "Are you sure you want to logout?", "Yes", "No");
+        bool answer = await Shell.Current.DisplayAlert("Logout", "Are you sure?", "Yes", "No");
         if (answer)
         {
-            await Shell.Current.GoToAsync("//Login");
+            await _supabase.Auth.SignOut();
+            Application.Current.MainPage = new LoginPage(new LoginViewModel(_supabase));
         }
     }
 }

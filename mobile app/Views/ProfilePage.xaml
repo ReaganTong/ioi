@@ -6,10 +6,6 @@
              Title="My Profile"
              BackgroundColor="#F5F5F5">
 
-    <ContentPage.BindingContext>
-        <viewmodels:ProfileViewModel />
-    </ContentPage.BindingContext>
-
     <ContentPage.Resources>
         <ResourceDictionary>
             <viewmodels:BoolToObjectConverter x:Key="BoolToObjectConverter" 
@@ -27,7 +23,6 @@
         <VerticalStackLayout Spacing="15" Padding="20">
 
             <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
-
                 <Grid WidthRequest="120" HeightRequest="120">
                     <Frame CornerRadius="60" Padding="0" IsClippedToBounds="True" BorderColor="White" HasShadow="True">
                         <Image Source="{Binding ProfileImage}" Aspect="AspectFill" />
@@ -63,20 +58,17 @@
                        HorizontalOptions="Center" />
             </VerticalStackLayout>
 
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
-                <Frame BackgroundColor="White" CornerRadius="15" Padding="15" BorderColor="Transparent" HasShadow="True">
-                    <VerticalStackLayout>
-                        <Label Text="{Binding QuizzesCompleted}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource CalmBlue}" HorizontalOptions="Center" />
-                        <Label Text="Quizzes" FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
-                    </VerticalStackLayout>
-                </Frame>
-                <Frame BackgroundColor="White" CornerRadius="15" Padding="15" BorderColor="Transparent" HasShadow="True" Grid.Column="1">
-                    <VerticalStackLayout>
-                        <Label Text="{Binding ReportsSubmitted}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource AlertRed}" HorizontalOptions="Center" />
-                        <Label Text="Reports" FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
-                    </VerticalStackLayout>
-                </Frame>
-            </Grid>
+            <Frame BackgroundColor="White" CornerRadius="15" Padding="15" BorderColor="Transparent" HasShadow="True">
+                <VerticalStackLayout>
+                    <Label Text="{Binding ReportsSubmitted}" 
+                           FontSize="24" FontAttributes="Bold" 
+                           TextColor="{StaticResource AlertRed}" 
+                           HorizontalOptions="Center" />
+                    <Label Text="Reports Submitted" 
+                           FontSize="12" TextColor="Gray" 
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
 
             <Frame BackgroundColor="White" CornerRadius="15" Padding="20" BorderColor="Transparent" HasShadow="True">
                 <VerticalStackLayout Spacing="15">
