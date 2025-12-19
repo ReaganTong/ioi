@@ -54,43 +54,28 @@ public partial class NewsViewModel : ObservableObject
     {
         try
         {
-            // 1. Create the channel
             var channel = _supabase.Realtime.Channel("news-updates");
 
-            // 2. Define the listener options (Schema: public, Table: news)
-            // Note: The enum is now 'ListenType'
             var changesOptions = new PostgresChangesOptions(
                 "public",
                 "news",
                 PostgresChangesOptions.ListenType.All
             );
 
-            // 3. Attach the options to the channel
             channel.Register(changesOptions);
 
-            // Inside SubscribeToRealtimeUpdates...
+            // Single consolidated handler
             channel.AddPostgresChangeHandler(PostgresChangesOptions.ListenType.All, async (sender, change) =>
             {
-                Debug.WriteLine($"Realtime Change: {change.Event}");
+                Debug.WriteLine($"Realtime Change Detected: {change.Event}");
 
-                // Use 'await' to ensure the notification logic runs
-                await LoadNewsAsync();
-                await ShowSystemNotification("New Campus Alert!", "Check the awareness feed for updates.");
-            });
-            // 4. Add the event handler using the correct method
-            // This replaces "channel.PostgresChanges += ..."
-            channel.AddPostgresChangeHandler(PostgresChangesOptions.ListenType.All, (sender, change) =>
-            {
-                // 'change' contains the event data (Insert, Update, Delete)
-                Debug.WriteLine($"Realtime Change: {change.Event}");
-
-                // Execute reload on the UI thread or background as needed
-                _ = LoadNewsAsync();
-
-                ShowSystemNotification("New Campus Alert!", "Check the awareness feed for updates.");
+                // Ensure UI updates on the Main Thread
+                MainThread.BeginInvokeOnMainThread(async () => {
+                    await LoadNewsAsync();
+                    await ShowSystemNotification("New Campus Alert!", "Check the awareness feed for updates.");
+                });
             });
 
-            // 5. Subscribe to start listening
             await channel.Subscribe();
         }
         catch (Exception ex)
@@ -101,12 +86,10 @@ public partial class NewsViewModel : ObservableObject
 
     private async Task ShowSystemNotification(string title, string desc)
     {
-        // 1. Check if we have permission
+        // Ensure the app has permission from the user
         if (await LocalNotificationCenter.Current.AreNotificationsEnabled() == false)
         {
-            // 2. Request permission if we don't have it
-            var granted = await LocalNotificationCenter.Current.RequestNotificationPermission();
-            if (!granted) return; // Exit if user says no
+            await LocalNotificationCenter.Current.RequestNotificationPermission();
         }
 
         var request = new NotificationRequest
@@ -117,7 +100,7 @@ public partial class NewsViewModel : ObservableObject
             BadgeNumber = 1,
             Schedule = new NotificationRequestSchedule
             {
-                NotifyTime = DateTime.Now.AddSeconds(1) // Tiny delay ensures system is ready
+                NotifyTime = DateTime.Now.AddSeconds(1) // Immediate delivery
             }
         };
 
