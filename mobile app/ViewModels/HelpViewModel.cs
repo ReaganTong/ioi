@@ -54,6 +54,20 @@ public partial class HelpViewModel : ObservableObject
     [RelayCommand]
     private static async Task PerformAction(HelpResource resource)
     {
+       
+        if (resource.Name == "UTS Counselling Unit")
+        {
+            try
+            {
+                await Browser.Default.OpenAsync("https://sdsc.uts.edu.my/psychology-counselling/", BrowserLaunchMode.SystemPreferred);
+                return; 
+            }
+            catch (Exception)
+            {
+                await Shell.Current.DisplayAlert("Error", "Could not open the link.", "OK");
+                return;
+            }
+        }
         // Fix: Safety check for null contact info
         if (string.IsNullOrWhiteSpace(resource.ContactInfo))
         {
